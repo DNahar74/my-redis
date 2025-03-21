@@ -12,6 +12,7 @@
 - Category -> Simple
 - First Byte -> +
 - Format -> +[string(must not include \r or \n)]\r\n
+- Leading and trailing whitespaces not allowed
 
 ## Simple Errors
 
@@ -20,6 +21,7 @@
 - First Byte -> -
 - Format -> -[simple string]\r\n
 - Redis convention -> -<ERROR_NAME(all caps)>[simple string]\r\n
+- Leading and trailing whitespaces not allowed
 
 ## Integers
 
@@ -34,6 +36,7 @@
 - Category -> Aggregate
 - First Byte -> $
 - Format -> $[length]\r\n[value]\r\n
+- Leading and trailing whitespaces are allowed
 
 ## Arrays
 

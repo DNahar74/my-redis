@@ -75,15 +75,10 @@ type BulkString struct {
 
 // Serialize returns the RESP serialization of the BulkString, and an error
 func (bs BulkString) Serialize() (string, error) {
-	bs.Value = strings.TrimSpace(bs.Value)
 	length := len(bs.Value)
 	bs.Length = length
 
-	if bs.Length == 0 {
-		return "", errors.New("BulkString cannot be empty")
-	}
-
-	return fmt.Sprintf("$%d\r\n%s\r\n", length, bs.Value), nil
+	return fmt.Sprintf("$%d\r\n%s\r\n", bs.Length, bs.Value), nil
 }
 
 //* Implementation of Arrays *//
