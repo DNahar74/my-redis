@@ -26,21 +26,22 @@
 - Protocol Version -> RESP2
 - Category -> Simple
 - First Byte -> :
-- Format -> :<+|->[value]\r\n
+- Format -> :<+|->[integer]\r\n
 
 ## Bulk Strings
 
-- Protocol Version -> 
-- Category -> 
-- First Byte -> 
-- Format -> 
+- Protocol Version -> RESP2
+- Category -> Aggregate
+- First Byte -> $
+- Format -> $[length]\r\n[value]\r\n
 
 ## Arrays
 
-- Protocol Version -> 
-- Category -> 
-- First Byte -> 
-- Format -> 
+- Protocol Version -> RESP2
+- Category -> Aggregate
+- First Byte -> *
+- Format -> *[number-of-elements]\r\n[element-1]...[element-n]
+- Remember, no need to end it with a \r\n for the array (element already ends with \r\n)
 
 ## Nulls
 
