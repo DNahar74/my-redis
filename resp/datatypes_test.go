@@ -185,7 +185,7 @@ func TestArraySerialize(t *testing.T) {
 		{
 			name: "Valid Array",
 			input: Array{
-				Items: []RSPEType{
+				Items: []RESPType{
 					Integer{Value: 123},
 					BulkString{Value: "hello"},
 				},
@@ -195,16 +195,16 @@ func TestArraySerialize(t *testing.T) {
 		{
 			name: "Empty Array",
 			input: Array{
-				Items: []RSPEType{},
+				Items: []RESPType{},
 			},
 			want: "*0\r\n",
 		},
 		{
 			name: "Nested Array",
 			input: Array{
-				Items: []RSPEType{
+				Items: []RESPType{
 					Integer{Value: 1},
-					Array{Items: []RSPEType{Integer{Value: 2}, BulkString{Value: "test"}}},
+					Array{Items: []RESPType{Integer{Value: 2}, BulkString{Value: "test"}}},
 				},
 			},
 			want: "*2\r\n:1\r\n*2\r\n:2\r\n$4\r\ntest\r\n",
