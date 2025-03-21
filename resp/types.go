@@ -11,7 +11,6 @@ import (
 // RSPEType represents an interface that is extended by all other RSPE data types
 type RSPEType interface {
 	Serialize() (string, error)
-	Deserialize() (RSPEType, error)
 }
 
 //* Implementation of Simple Strings *//
