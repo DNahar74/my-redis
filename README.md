@@ -1,0 +1,56 @@
+# Datatypes to be implemented
+
+## Rules
+
+- Data inside [] is required
+- Data inside <> is optional
+
+
+## Simple Strings
+
+- Protocol Version -> RESP 2
+- Category -> Simple
+- First Byte -> +
+- Format -> +[string(must not include \r or \n)]\r\n
+
+## Simple Errors
+
+- Protocol Version -> RESP 2
+- Category -> Simple
+- First Byte -> -
+- Format -> -[simple string]\r\n
+- Redis convention -> -<ERROR_NAME(all caps)>[simple string]\r\n
+
+## Integers
+
+- Protocol Version -> RESP2
+- Category -> Simple
+- First Byte -> :
+- Format -> :<+|->[value]\r\n
+
+## Bulk Strings
+
+- Protocol Version -> 
+- Category -> 
+- First Byte -> 
+- Format -> 
+
+## Arrays
+
+- Protocol Version -> 
+- Category -> 
+- First Byte -> 
+- Format -> 
+
+## Nulls
+
+- Protocol Version -> 
+- Category -> 
+- First Byte -> 
+- Format -> 
+
+## Booleans
+- Protocol Version -> 
+- Category -> 
+- First Byte -> 
+- Format -> 
