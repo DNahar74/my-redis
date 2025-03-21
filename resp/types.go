@@ -11,6 +11,7 @@ import (
 // RSPEType represents an interface that is extended by all other RSPE data types
 type RSPEType interface {
 	Serialize() (string, error)
+	Deserialize() (RSPEType, error)
 }
 
 //* Implementation of Simple Strings *//
@@ -99,11 +100,7 @@ func (a Array) Serialize() (string, error) {
 	length := len(a.Items)
 	a.Length = length
 
-	if a.Length == 0 {
-		return "", errors.New("Array cannot be empty")
-	}
-
-	str := fmt.Sprintf("*%d\r\n", length)
+	str := fmt.Sprintf("*%d\r\n", a.Length)
 	for _, v := range a.Items {
 		sv, err := v.Serialize()
 		if err != nil {
