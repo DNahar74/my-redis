@@ -1,5 +1,4 @@
-//TODO: ✔️ Allow multiple clients to connect
-//TODO: (2) Understand this ::
+//TODO: (✔️fixed) Understand this :: (The issue is that we are not handling this command properly bcoz. of which the client never moves forward)
 //? read command:
 //? *2
 //? $7
@@ -68,6 +67,12 @@ func handleConnection(conn net.Conn) {
 
 		if commands[2] == "PING" {
 			sendMessage(conn, "+PONG\r\n")
+		} else if commands[2] == "COMMAND" {
+			// Respond to the COMMAND DOCS request
+			sendMessage(conn, "-ERR Unknown command\r\n")
+		} else {
+			// Handle unknown commands
+			sendMessage(conn, "-ERR Unknown command\r\n")
 		}
 	}
 }
