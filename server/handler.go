@@ -23,7 +23,8 @@ func handleConnection(conn net.Conn) {
 			// EOF can be used to find if the user disconnected
 			if err.Error() == "EOF" {
 				fmt.Println("Client Disconnected:", conn.RemoteAddr().String())
-				err = utils.SendMessage(conn, "+DISCONNECTED\r\n")
+				message := resp.BulkString{Value: "DISCONNECTED"}
+				err = utils.SendMessage(conn, message)
 				return
 			}
 
@@ -33,13 +34,16 @@ func handleConnection(conn net.Conn) {
 		commands := resp.GetCommands(buf)
 
 		if commands[2] == "PING" {
-			utils.SendMessage(conn, "+PONG\r\n")
+			message := resp.SimpleString{Value: "PONG"}
+			utils.SendMessage(conn, message)
 		} else if commands[2] == "COMMAND" {
 			// Respond to the COMMAND DOCS request
-			utils.SendMessage(conn, "-ERR Unknown command\r\n")
+			message := resp.SimpleError{Value: "ERR recieved COMMAND"}
+			utils.SendMessage(conn, message)
 		} else {
 			// Handle unknown commands
-			utils.SendMessage(conn, "-ERR Unknown command\r\n")
+			message := resp.SimpleError{Value: "ERR Unknown command"}
+			utils.SendMessage(conn, message)
 		}
 	}
 }
