@@ -1,5 +1,11 @@
-//! (1) When a client disconnects it shows :: {Error reading from connection:  EOF}
-//TODO: (1) Allow multiple clients to connect
+//TODO: ✔️ Allow multiple clients to connect
+//TODO: (2) Understand this ::
+//? read command:
+//? *2
+//? $7
+//? COMMAND
+//? $4
+//? DOCS
 
 package main
 
@@ -14,41 +20,54 @@ func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
-    fmt.Println("Error starting the listener:", err)
-    return
-  }
+		fmt.Println("Error starting the listener:", err)
+		return
+	}
 	defer listener.Close()
 
 	fmt.Println("Server listening on port 6379")
 
-	conn, err := listener.Accept()
-	if err != nil {
-		fmt.Println("Error connecting the client", err)
-		return
-	}
+	// Allow multiple connections
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("Error connecting the client", err)
+			return
+		}
 
+		// make a goroutine for handling R/W
+		go handleConnection(conn)
+	}
+}
+
+// handleConnection for each client in a seperate goroutine
+func handleConnection(conn net.Conn) {
 	fmt.Println("Client connected")
+	fmt.Println("address:", conn.RemoteAddr().String())
+	defer conn.Close()
 
 	buf := make([]byte, 128)
 
+	// keep reading the input until the client disconnects
 	for {
-		_, err = conn.Read(buf)
+		_, err := conn.Read(buf)
 		if err != nil {
-			fmt.Println("Error reading from connection: ", err.Error())
-			return
-		}
-		defer conn.Close()
-	
-		fmt.Printf("read command:\n%s", buf)
-	
-		commands := getCommands(buf)
-	
-		if commands[2] == "PING" {
-			message := []byte("+PONG\r\n")
-			_, err := conn.Write(message)
-			if err != nil {
-				fmt.Printf("Error writing to client: %v\n", err)
+			// EOF can be used to find if the user disconnected
+			if err.Error() == "EOF" {
+				fmt.Println("Client Disconnected:", conn.RemoteAddr().String())
+				err = sendMessage(conn, "+DISCONNECTED\r\n")
+				return
 			}
+
+			fmt.Println("Error reading from connection: ", err.Error())
+		}
+
+		fmt.Printf("read command:\n%s", buf)
+
+		commands := getCommands(buf)
+
+		if commands[2] == "PING" {
+			sendMessage(conn, "+PONG\r\n")
 		}
 	}
 }
@@ -56,8 +75,19 @@ func main() {
 func getCommands(buf []byte) []string {
 	val := string(buf)
 	val = strings.ToUpper(val)
-	
+
 	inputs := strings.Split(val, "\r\n")
 
 	return inputs
+}
+
+func sendMessage(conn net.Conn, message string) error {
+	response := []byte(message)
+	_, err := conn.Write(response)
+	if err != nil {
+		fmt.Printf("Error writing [message: %s] to client: %v\n", message, err)
+		return err
+	}
+
+	return nil
 }
