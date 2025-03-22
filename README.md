@@ -48,10 +48,10 @@
 
 ## Nulls
 
-- Protocol Version -> 
-- Category -> 
-- First Byte -> 
-- Format -> 
+- Protocol Version -> RESP3
+- Category -> Simple
+- First Byte -> _
+- Format -> _\r\n
 
 ## Booleans
 - Protocol Version -> 

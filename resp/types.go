@@ -106,3 +106,14 @@ func (a Array) Serialize() (string, error) {
 
 	return str, nil
 }
+
+
+//* Implementation of Null *//
+
+// Null represents a RESP Null value
+type Null struct {}
+
+// Serialize returns the RESP serialization of the Null value, and an error
+func (s Null) Serialize() (string, error) {
+	return "_\r\n", nil
+}
