@@ -177,16 +177,15 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		return Array{}, 0, err
 	}
 
-	fmt.Println("arrlen:", arrLen)
-
 	if arrLen == 0 {
 		return Array{Length: 0, Items: []RESPType{}}, 1, nil
 	}
 
 	data := make([]RESPType, arrLen)
 	elements := 0
+	i := 0
 
-	for i := 0; i < arrLen; i++ {
+	for i = 0; i < arrLen; i++ {
 		cmd := addCRLF(commands[i+1:])
 		v, el, err := deserializeCommand(cmd)
 		if err != nil {
@@ -197,7 +196,7 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		elements++
 	}
 
-	if arrLen == elements {
+	if arrLen == elements && len(commands[i+1:]) == 0 {
 		return Array{Length: arrLen, Items: data}, arrLen + 1, nil
 	}
 
