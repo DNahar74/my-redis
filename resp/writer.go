@@ -1,10 +1,10 @@
-//TODO: (1) Understand and use string.Builder instead of Sprintf
+//TODO: ✔️ Understand and use string.Builder instead of Sprintf
 
 package resp
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -25,12 +25,16 @@ func (s SimpleString) Serialize() (string, error) {
 	s.Value = strings.TrimSpace(s.Value)
 
 	if strings.Contains(s.Value, "\r") || strings.Contains(s.Value, "\n") {
-		return "", errors.New("SimpleString cannot contain \\r or \\n characters")
+		return "", errors.New("SimpleString cannot contain CR or LF characters")
 	} else if s.Value == "" {
 		return "", errors.New("SimpleString cannot be empty")
 	}
 
-	return fmt.Sprintf("+%s\r\n", s.Value), nil
+	var sb strings.Builder
+	sb.WriteByte('+')
+	sb.WriteString(s.Value)
+	sb.WriteString("\r\n")
+	return sb.String(), nil
 }
 
 //* Implementation of Simple Errors *//
@@ -50,7 +54,11 @@ func (s SimpleError) Serialize() (string, error) {
 		return "", errors.New("SimpleError cannot be empty")
 	}
 
-	return fmt.Sprintf("-%s\r\n", s.Value), nil
+	var sb strings.Builder
+	sb.WriteByte('-')
+	sb.WriteString(s.Value)
+	sb.WriteString("\r\n")
+	return sb.String(), nil
 }
 
 //* Implementation of Integers *//
@@ -62,7 +70,11 @@ type Integer struct {
 
 // Serialize returns the RESP serialization of the Integer, and an error
 func (i Integer) Serialize() (string, error) {
-	return fmt.Sprintf(":%d\r\n", i.Value), nil
+	var sb strings.Builder
+	sb.WriteByte(':')
+	sb.WriteString(strconv.Itoa(i.Value))
+	sb.WriteString("\r\n")
+	return sb.String(), nil
 }
 
 //* Implementation of Bulk Strings *//
@@ -78,7 +90,13 @@ func (bs BulkString) Serialize() (string, error) {
 	length := len(bs.Value)
 	bs.Length = length
 
-	return fmt.Sprintf("$%d\r\n%s\r\n", bs.Length, bs.Value), nil
+	var sb strings.Builder
+	sb.WriteByte('$')
+	sb.WriteString(strconv.Itoa(bs.Length))
+	sb.WriteString("\r\n")
+	sb.WriteString(bs.Value)
+	sb.WriteString("\r\n")
+	return sb.String(), nil
 }
 
 //* Implementation of Arrays *//
@@ -94,24 +112,27 @@ func (a Array) Serialize() (string, error) {
 	length := len(a.Items)
 	a.Length = length
 
-	str := fmt.Sprintf("*%d\r\n", a.Length)
+	var sb strings.Builder
+	sb.WriteByte('*')
+	sb.WriteString(strconv.Itoa(a.Length))
+	sb.WriteString("\r\n")
+
 	for _, v := range a.Items {
 		sv, err := v.Serialize()
 		if err != nil {
 			return "", err
 		}
 
-		str += sv
+		sb.WriteString(sv)
 	}
 
-	return str, nil
+	return sb.String(), nil
 }
-
 
 //* Implementation of Null *//
 
 // Null represents a RESP Null value
-type Null struct {}
+type Null struct{}
 
 // Serialize returns the RESP serialization of the Null value, and an error
 func (s Null) Serialize() (string, error) {
