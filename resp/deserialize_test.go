@@ -9,13 +9,13 @@ func TestDeserializeSimpleString(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    []RESPType
+		want    RESPType
 		wantErr bool
 	}{
 		{
 			name:    "Valid SimpleString",
 			input:   "+hello\r\n",
-			want:    []RESPType{SimpleString{Value: "hello"}},
+			want:    SimpleString{Value: "hello"},
 			wantErr: false,
 		},
 		{
@@ -48,13 +48,13 @@ func TestDeserializeSimpleError(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    []RESPType
+		want    RESPType
 		wantErr bool
 	}{
 		{
 			name:    "Valid SimpleError",
 			input:   "-Error message\r\n",
-			want:    []RESPType{SimpleError{Value: "Error message"}},
+			want:    SimpleError{Value: "Error message"},
 			wantErr: false,
 		},
 		{
@@ -87,25 +87,25 @@ func TestDeserializeInteger(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    []RESPType
+		want    RESPType
 		wantErr bool
 	}{
 		{
 			name:    "Valid Integer",
 			input:   ":123\r\n",
-			want:    []RESPType{Integer{Value: 123}},
+			want:    Integer{Value: 123},
 			wantErr: false,
 		},
 		{
 			name:    "Negative Integer",
 			input:   ":-456\r\n",
-			want:    []RESPType{Integer{Value: -456}},
+			want:    Integer{Value: -456},
 			wantErr: false,
 		},
 		{
 			name:    "Zero Integer",
 			input:   ":0\r\n",
-			want:    []RESPType{Integer{Value: 0}},
+			want:    Integer{Value: 0},
 			wantErr: false,
 		},
 		{
@@ -138,19 +138,19 @@ func TestDeserializeBulkString(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    []RESPType
+		want    RESPType
 		wantErr bool
 	}{
 		{
 			name:    "Valid BulkString",
 			input:   "$5\r\nhello\r\n",
-			want:    []RESPType{BulkString{Value: "hello", Length: 5}},
+			want:    BulkString{Value: "hello", Length: 5},
 			wantErr: false,
 		},
 		{
 			name:    "Empty BulkString",
 			input:   "$0\r\n\r\n",
-			want:    []RESPType{BulkString{Value: "", Length: 0}},
+			want:    BulkString{Value: "", Length: 0},
 			wantErr: false,
 		},
 		{
@@ -228,8 +228,18 @@ func TestDeserializeArray(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "Invalid Array Length",
-			input:   "*2\r\n:123\r\n$5\r\nhello",
+			name:    "Invalid Array Length - incorrect length",
+			input:   "*a\r\n:1\r\n", //invalid length
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Array Length - too many elements",
+			input:   "*2\r\n:123\r\n$5\r\nhello\r\n:456\r\n", // 3 elements, length is 2
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Array Length - too few elements",
+			input:   "*3\r\n:123\r\n$5\r\nhello\r\n", // 2 elements, length is 3
 			wantErr: true,
 		},
 	}
@@ -241,7 +251,7 @@ func TestDeserializeArray(t *testing.T) {
 				t.Errorf("DeserializeArray() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got, tt.want) && tt.wantErr == false {
 				t.Errorf("DeserializeArray() = %v, want %v", got, tt.want)
 			}
 		})

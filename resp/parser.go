@@ -22,7 +22,7 @@ func GetCommands(buf []byte) []string {
 }
 
 // Deserialize takes a command as input and deserializes it
-func Deserialize(cmds string) ([]RESPType, error) {
+func Deserialize(cmds string) (RESPType, error) {
 	// Empty command
 	command := strings.Trim(cmds, " ")
 	if len(command) == 0 {
@@ -43,9 +43,6 @@ func Deserialize(cmds string) ([]RESPType, error) {
 		return nil, errors.New("Invalid input")
 	}
 
-	// returned data
-	var data []RESPType
-
 	for i := 0; i < len(inputs); i++ {
 		v := inputs[i]
 
@@ -55,32 +52,37 @@ func Deserialize(cmds string) ([]RESPType, error) {
 			if err != nil {
 				return nil, err
 			}
-			data = append(data, val)
+			return val, nil
 		case '-':
 			val, err := DeserializeSimpleError(v)
 			if err != nil {
 				return nil, err
 			}
-			data = append(data, val)
+			return val, nil
 		case ':':
 			val, err := DeserializeInteger(v)
 			if err != nil {
 				return nil, err
 			}
-			data = append(data, val)
+			return val, nil
 		case '$':
-			val, el, err := DeserializeBulkString(inputs[i:])
+			val, _, err := DeserializeBulkString(inputs[i:])
 			if err != nil {
 				return nil, err
 			}
-			data = append(data, val)
-			i += el
+			return val, nil
+		case '*':
+			val, _, err := DeserializeArray(inputs[i:])
+			if err != nil {
+				return nil, err
+			}
+			return val, nil
 		default:
 			return nil, errors.New("Invalid datatype")
 		}
 	}
 
-	return data, nil
+	return Null{}, nil
 }
 
 // DeserializeSimpleString returns a simpleString with value stored in it
@@ -101,7 +103,7 @@ func DeserializeSimpleError(command string) (SimpleError, error) {
 	return s, nil
 }
 
-// DeserializeInteger returns a simpleError with value stored in it
+// DeserializeInteger returns an Integer with value stored in it
 func DeserializeInteger(command string) (Integer, error) {
 	if command[0] != ':' {
 		return Integer{}, errors.New("Not Integer datatype")
@@ -115,7 +117,7 @@ func DeserializeInteger(command string) (Integer, error) {
 	return s, nil
 }
 
-// DeserializeBulkString returns a simpleError with value stored in it
+// DeserializeBulkString returns a BulkString with value stored in it
 func DeserializeBulkString(commands []string) (BulkString, int, error) {
 	if commands[0][0] != '$' {
 		return BulkString{}, 0, errors.New("Not a BulkString datatype")
@@ -160,4 +162,117 @@ func DeserializeBulkString(commands []string) (BulkString, int, error) {
 	}
 
 	return BulkString{Value: str, Length: bsLenCopy}, elementsUsed, nil
+}
+
+// DeserializeArray returns an Array with value stored in it
+func DeserializeArray(commands []string) (Array, int, error) {
+
+	if commands[0][0] != '*' {
+		return Array{}, 0, errors.New("Not an Array datatype")
+	}
+	val := commands[0][1:]
+	arrLen, err := strconv.Atoi(val)
+	if err != nil {
+		fmt.Println("error:", err)
+		return Array{}, 0, err
+	}
+
+	fmt.Println("arrlen:", arrLen)
+
+	if arrLen == 0 {
+		return Array{Length: 0, Items: []RESPType{}}, 1, nil
+	}
+
+	data := make([]RESPType, arrLen)
+	elements := 0
+
+	for i := 0; i < arrLen; i++ {
+		cmd := addCRLF(commands[i+1:])
+		v, el, err := deserializeCommand(cmd)
+		if err != nil {
+			return Array{}, 0, err
+		}
+		data[i] = v
+		i += el
+		elements++
+	}
+
+	if arrLen == elements {
+		return Array{Length: arrLen, Items: data}, arrLen + 1, nil
+	}
+
+	return Array{}, 0, errors.New("Invalid Array: length mismatch")
+}
+
+func addCRLF(commands []string) string {
+	str := ""
+
+	for _, v := range commands {
+		str += v + "\r\n"
+	}
+
+	return str
+}
+
+func deserializeCommand(cmds string) (RESPType, int, error) {
+	// Empty command
+	command := strings.Trim(cmds, " ")
+	if len(command) == 0 {
+		return nil, 0, errors.New("Empty input")
+	}
+
+	// No CRLF
+	if !strings.HasSuffix(command, "\r\n") {
+		return nil, 0, errors.New("No CRLF")
+	}
+
+	// Remove the last "\r\n" to remove an extra "" in the inputs array
+	command = strings.TrimSuffix(command, "\r\n")
+
+	// No commands
+	inputs := strings.Split(command, "\r\n")
+	if len(inputs) == 0 {
+		return nil, 0, errors.New("Invalid input")
+	}
+
+	for i := 0; i < len(inputs); i++ {
+		v := inputs[i]
+
+		switch v[0] {
+		case '+':
+			val, err := DeserializeSimpleString(v)
+			if err != nil {
+				return nil, 0, err
+			}
+			return val, 0, nil
+		case '-':
+			val, err := DeserializeSimpleError(v)
+			if err != nil {
+				return nil, 0, err
+			}
+			return val, 0, nil
+		case ':':
+			val, err := DeserializeInteger(v)
+			if err != nil {
+				return nil, 0, err
+			}
+			return val, 0, nil
+		case '$':
+			val, el, err := DeserializeBulkString(inputs[i:])
+			if err != nil {
+				return nil, 0, err
+			}
+			return val, el, nil
+		case '*':
+			val, el, err := DeserializeArray(inputs[i:])
+			if err != nil {
+				return nil, 0, err
+			}
+			return val, el, nil
+		default:
+			return nil, 0, errors.New("Invalid datatype")
+		}
+	}
+
+	return nil, 0, errors.New("Internal Error")
 }
