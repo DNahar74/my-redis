@@ -1,5 +1,3 @@
-//TODO: ✔️ Understand and use string.Builder instead of Sprintf
-
 package resp
 
 import (

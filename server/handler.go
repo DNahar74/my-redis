@@ -1,9 +1,12 @@
+//TODO: (1) Handle errors by continuing to next loop and returning valid error to client
+
 package server
 
 import (
 	"fmt"
 	"net"
 
+	"github.com/DNahar74/my-redis/command"
 	"github.com/DNahar74/my-redis/resp"
 	"github.com/DNahar74/my-redis/utils"
 )
@@ -18,32 +21,45 @@ func handleConnection(conn net.Conn) {
 
 	// keep reading the input until the client disconnects
 	for {
-		_, err := conn.Read(buf)
+		n, err := conn.Read(buf)
 		if err != nil {
 			// EOF can be used to find if the user disconnected
 			if err.Error() == "EOF" {
 				fmt.Println("Client Disconnected:", conn.RemoteAddr().String())
 				message := resp.BulkString{Value: "DISCONNECTED"}
 				err = utils.SendMessage(conn, message)
+				if err != nil {
+					fmt.Println("Error sending response: ", err.Error())
+					return
+				}
 				return
 			}
 
 			fmt.Println("Error reading from connection: ", err.Error())
 		}
 
-		commands := resp.GetCommands(buf)
+		cmd := string(buf[:n])
 
-		if commands[2] == "PING" {
-			message := resp.SimpleString{Value: "PONG"}
-			utils.SendMessage(conn, message)
-		} else if commands[2] == "COMMAND" {
-			// Respond to the COMMAND DOCS request
-			message := resp.SimpleError{Value: "ERR recieved COMMAND"}
-			utils.SendMessage(conn, message)
-		} else {
-			// Handle unknown commands
-			message := resp.SimpleError{Value: "ERR Unknown command"}
-			utils.SendMessage(conn, message)
+		fmt.Println("Input:", cmd)
+
+		commands, err := resp.Deserialize(cmd)
+		if err != nil {
+			fmt.Println("Error deserializing commands: ", err.Error())
+			return
+		}
+
+		fmt.Println("commands: ", commands)
+
+		val, err := command.HandleCommands(commands)
+		if err != nil {
+			fmt.Println("Error handling commands: ", err.Error())
+			return
+		}
+
+		err = utils.SendMessage(conn, val)
+		if err != nil {
+			fmt.Println("Error sending response: ", err.Error())
+			return
 		}
 	}
 }
