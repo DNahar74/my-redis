@@ -43,8 +43,6 @@ func Deserialize(cmds string) (RESPType, error) {
 		return nil, errors.New("Invalid input")
 	}
 
-	fmt.Println("IP: ", inputs)
-
 	for i := range len(inputs) {
 		v := inputs[i]
 

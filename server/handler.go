@@ -15,6 +15,7 @@ import (
 func handleConnection(conn net.Conn) {
 	fmt.Println("Client connected")
 	fmt.Println("address:", conn.RemoteAddr().String())
+	fmt.Println("")
 	defer conn.Close()
 
 	buf := make([]byte, 128)
@@ -47,8 +48,6 @@ func handleConnection(conn net.Conn) {
 			fmt.Println("Error deserializing commands: ", err.Error())
 			return
 		}
-
-		fmt.Println("commands: ", commands)
 
 		val, err := command.HandleCommands(commands)
 		if err != nil {

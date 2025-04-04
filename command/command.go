@@ -95,6 +95,9 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 				v := handlePING()
 				return v, nil
 			case "ECHO":
+				if len(str.Items) < 2 {
+					return nil, errors.New("ECHO requires an argument")
+				}
 				v, err := handleECHO(str.Items[1])
 				if err != nil {
           return nil, err
