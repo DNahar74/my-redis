@@ -100,9 +100,9 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 				}
 				v, err := handleECHO(str.Items[1])
 				if err != nil {
-          return nil, err
-        }
-        return v, nil
+					return nil, err
+				}
+				return v, nil
 			default:
 				return nil, errors.New("Unknown Command")
 			}

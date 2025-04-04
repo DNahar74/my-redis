@@ -12,7 +12,7 @@ type Server struct {
 
 // NewServer creates a new Server object
 func NewServer(address string) *Server {
-  return &Server{address: address}
+	return &Server{address: address}
 }
 
 // Start starts the Redis server

@@ -185,7 +185,7 @@ func DeserializeArray(commands []string) (Array, int, error) {
 
 	data := make([]RESPType, arrLen)
 	elements := 0
-	index := 0	// Handling the indexes in CMDS array
+	index := 0 // Handling the indexes in CMDS array
 
 	for i := range arrLen {
 		cmd := addCRLF(commands[index+1:])
@@ -195,7 +195,7 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		}
 
 		data[i] = v
-		index += (el+1)
+		index += (el + 1)
 		elements++
 	}
 
