@@ -1,4 +1,4 @@
-//TODO: (1) Handle errors by continuing to next loop and returning valid error to client
+//TODO: ✔️ Handle errors by continuing to next loop and returning valid error to client
 
 package server
 
@@ -52,19 +52,23 @@ func handleConnection(conn net.Conn) {
 		commands, err := resp.Deserialize(cmd)
 		if err != nil {
 			fmt.Println("Error deserializing commands: ", err.Error())
-			return
+			m := resp.SimpleError{Value: err.Error()}
+			utils.SendMessage(conn, m)
+			continue
 		}
 
 		val, err := command.HandleCommands(commands)
 		if err != nil {
 			fmt.Println("Error handling commands: ", err.Error())
-			return
+			m := resp.SimpleError{Value: err.Error()}
+			utils.SendMessage(conn, m)
+			continue
 		}
 
 		err = utils.SendMessage(conn, val)
 		if err != nil {
 			fmt.Println("Error sending response: ", err.Error())
-			return
+			continue
 		}
 	}
 }
