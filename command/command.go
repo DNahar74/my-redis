@@ -94,6 +94,12 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 			case "PING":
 				v := handlePING()
 				return v, nil
+			case "ECHO":
+				v, err := handleECHO(str.Items[1])
+				if err != nil {
+          return nil, err
+        }
+        return v, nil
 			default:
 				return nil, errors.New("Unknown Command")
 			}
