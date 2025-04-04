@@ -8,8 +8,12 @@ import (
 
 	"github.com/DNahar74/my-redis/command"
 	"github.com/DNahar74/my-redis/resp"
+	"github.com/DNahar74/my-redis/store"
 	"github.com/DNahar74/my-redis/utils"
 )
+
+// RedisStore is a global variable to hold the Redis data store
+var RedisStore = store.CreateStorage()
 
 // handleConnection takes the connecton request for a client and handles the input and output
 func handleConnection(conn net.Conn) {
@@ -19,6 +23,8 @@ func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	buf := make([]byte, 128)
+
+	command.InitStore(RedisStore)
 
 	// keep reading the input until the client disconnects
 	for {
