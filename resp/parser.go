@@ -43,7 +43,9 @@ func Deserialize(cmds string) (RESPType, error) {
 		return nil, errors.New("Invalid input")
 	}
 
-	for i := 0; i < len(inputs); i++ {
+	fmt.Println("IP: ", inputs)
+
+	for i := range len(inputs) {
 		v := inputs[i]
 
 		switch v[0] {
@@ -166,10 +168,11 @@ func DeserializeBulkString(commands []string) (BulkString, int, error) {
 
 // DeserializeArray returns an Array with value stored in it
 func DeserializeArray(commands []string) (Array, int, error) {
-
-	if commands[0][0] != '*' {
+	if len(commands) == 0 || commands[0][0] != '*' {
 		return Array{}, 0, errors.New("Not an Array datatype")
 	}
+
+	// Extract array length
 	val := commands[0][1:]
 	arrLen, err := strconv.Atoi(val)
 	if err != nil {
@@ -177,26 +180,28 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		return Array{}, 0, err
 	}
 
+	// Handle empty array
 	if arrLen == 0 {
 		return Array{Length: 0, Items: []RESPType{}}, 1, nil
 	}
 
 	data := make([]RESPType, arrLen)
 	elements := 0
-	i := 0
+	index := 0	// Handling the indexes in CMDS array
 
-	for i = 0; i < arrLen; i++ {
-		cmd := addCRLF(commands[i+1:])
+	for i := range arrLen {
+		cmd := addCRLF(commands[index+1:])
 		v, el, err := deserializeCommand(cmd)
 		if err != nil {
 			return Array{}, 0, err
 		}
+
 		data[i] = v
-		i += el
+		index += (el+1)
 		elements++
 	}
 
-	if arrLen == elements && len(commands[i+1:]) == 0 {
+	if arrLen == elements && len(commands[index+1:]) == 0 {
 		return Array{Length: arrLen, Items: data}, arrLen + 1, nil
 	}
 
@@ -269,7 +274,8 @@ func deserializeCommand(cmds string) (RESPType, int, error) {
 			}
 			return val, el, nil
 		default:
-			return nil, 0, errors.New("Invalid datatype")
+			fmt.Println("v[0] :", v[0])
+			return nil, 0, errors.New("Invalid datatype my")
 		}
 	}
 
