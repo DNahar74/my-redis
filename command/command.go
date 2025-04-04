@@ -123,7 +123,9 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 			case "GET":
 				if len(str.Items) < 2 {
           return nil, errors.New("GET requires a key")
-        }
+        } else if len(str.Items) > 2 {
+					return nil, errors.New("GET supports only one key")
+				}
         v, err := handleGET(str.Items[1])
         if err != nil {
           return nil, err
