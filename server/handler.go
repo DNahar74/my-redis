@@ -1,5 +1,3 @@
-//TODO: ✔️ Handle errors by continuing to next loop and returning valid error to client
-
 package server
 
 import (

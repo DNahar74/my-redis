@@ -31,6 +31,7 @@ func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
 	}
 
 	redisStore.Items[key.Value] = store.Data{Value: value}
+	// redisStore.Items[key.Value] = store.Data{Value: value, Expiry: time.Now()}
 
 	return resp.SimpleString{Value: "OK"}, nil
 }
@@ -42,6 +43,10 @@ func handleGET(k resp.RESPType) (resp.RESPType, error) {
 	}
 
 	if data, ok := redisStore.Items[key.Value]; ok {
+		// if data.Expiry.Before(time.Now()) {
+    //   delete(redisStore.Items, key.Value)
+    //   return nil, errors.New("Key expired")
+    // }
 		return data.Value, nil
 	}
 

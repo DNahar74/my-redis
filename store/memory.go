@@ -1,3 +1,5 @@
+//TODO: (1) Review this memory storage & access
+
 package store
 
 import (
