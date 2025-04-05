@@ -52,3 +52,17 @@ func handleGET(k resp.RESPType) (resp.RESPType, error) {
 
 	return nil, errors.New("Key not found")
 }
+
+func handleDEL(k resp.RESPType) (resp.RESPType, error) {
+	key, ok := k.(resp.BulkString)
+	if !ok {
+		return nil, errors.New("Invalid key type")
+	}
+
+	if _, ok := redisStore.Items[key.Value]; ok {
+		delete(redisStore.Items, key.Value)
+		return resp.SimpleString{Value: "OK"}, nil
+	}
+
+	return nil, errors.New("Key not found")
+}

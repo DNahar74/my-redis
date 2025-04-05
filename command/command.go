@@ -131,6 +131,17 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
           return nil, err
         }
         return v, nil
+			case "DEL":
+				if len(str.Items) < 2 {
+          return nil, errors.New("DEL requires a key")
+				} else if len(str.Items) > 2 {
+					return nil, errors.New("DEL supports only one key")
+				}
+				v, err := handleDEL(str.Items[1])
+				if err != nil {
+					return nil, err
+				}
+				return v, nil
 			default:
 				return nil, errors.New("Unknown Command")
 			}
