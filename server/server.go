@@ -3,6 +3,9 @@ package server
 import (
 	"fmt"
 	"net"
+
+	"github.com/DNahar74/my-redis/command"
+	"github.com/DNahar74/my-redis/store"
 )
 
 // Server represents a Redis server configurations
@@ -25,6 +28,9 @@ func (s *Server) Start() error {
 	defer listener.Close()
 
 	fmt.Println("Server listening on port 6379")
+
+	var RedisStore = store.CreateStorage()
+	command.InitStore(RedisStore)
 
 	// Allow multiple connections
 	for {
