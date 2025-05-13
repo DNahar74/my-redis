@@ -96,7 +96,7 @@ func handleBulkString(command resp.RESPType) (resp.RESPType, error) {
 
 func handleArray(command resp.RESPType) (resp.RESPType, error) {
 	if str, ok := command.(resp.Array); ok {
-
+		// If the command is an array, check if the first element is a BulkString(all command names are BulkStrings)
 		if cmd, ok := str.Items[0].(resp.BulkString); ok {
 			switch strings.ToUpper(cmd.Value) {
 			case "PING":
