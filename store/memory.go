@@ -3,6 +3,7 @@
 package store
 
 import (
+	"sync"
 	"time"
 
 	"github.com/DNahar74/my-redis/resp"
@@ -17,12 +18,14 @@ type Data struct {
 // Store is a map of keys to Data items
 type Store struct {
 	Items map[string]Data
+	Lock sync.RWMutex
 }
 
 // CreateStorage initializes a new store instance
 func CreateStorage() *Store {
 	s := &Store{
 		Items: make(map[string]Data),
+		Lock: sync.RWMutex{},
 	}
 
 	return s

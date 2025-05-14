@@ -30,6 +30,10 @@ func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
 		return nil, errors.New("Invalid value type")
 	}
 
+	//? Add a write lock to prevent reads during a write
+	redisStore.Lock.Lock()
+	defer redisStore.Lock.Unlock()
+
 	redisStore.Items[key.Value] = store.Data{Value: value}
 	// redisStore.Items[key.Value] = store.Data{Value: value, Expiry: time.Now()}
 
@@ -41,6 +45,11 @@ func handleGET(k resp.RESPType) (resp.RESPType, error) {
 	if !ok {
 		return nil, errors.New("Invalid key type")
 	}
+
+	//? Add a read lock to prevent writes during a read
+	//? It blocks writers but readers can proceed
+	redisStore.Lock.RLock()
+	defer redisStore.Lock.RUnlock()
 
 	if data, ok := redisStore.Items[key.Value]; ok {
 		// if data.Expiry.Before(time.Now()) {
@@ -60,6 +69,10 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	}
 
 	if _, ok := redisStore.Items[key.Value]; ok {
+		//? Add a write lock to prevent reads during a write
+		redisStore.Lock.Lock()
+		defer redisStore.Lock.Unlock()
+		
 		delete(redisStore.Items, key.Value)
 		return resp.SimpleString{Value: "OK"}, nil
 	}
