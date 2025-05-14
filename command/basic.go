@@ -1,3 +1,5 @@
+// TODO: (1) Check for race condition in delete command
+
 package command
 
 import (
@@ -30,7 +32,7 @@ func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
 		return nil, errors.New("Invalid value type")
 	}
 
-	//? Add a write lock to prevent reads during a write
+	//? Add a write lock to prevent reads/writes during a write
 	redisStore.Lock.Lock()
 	defer redisStore.Lock.Unlock()
 
@@ -69,10 +71,11 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	}
 
 	if _, ok := redisStore.Items[key.Value]; ok {
-		//? Add a write lock to prevent reads during a write
+		//? Add a write lock to prevent reads/writes during a delete
+		//? Also, the existance of the key is checked before deleting (maybe an issue, if there is write then delete, but the order changes due to a race condition)
 		redisStore.Lock.Lock()
 		defer redisStore.Lock.Unlock()
-		
+
 		delete(redisStore.Items, key.Value)
 		return resp.SimpleString{Value: "OK"}, nil
 	}
