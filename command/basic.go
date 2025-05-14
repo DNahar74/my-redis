@@ -4,6 +4,9 @@ package command
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/DNahar74/my-redis/resp"
 	"github.com/DNahar74/my-redis/store"
@@ -21,10 +24,15 @@ func handleECHO(value resp.RESPType) (resp.RESPType, error) {
 	return nil, errors.New("Invalid input type")
 }
 
-func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
+func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
 		return nil, errors.New("Invalid key type")
+	}
+
+	_, err := strconv.Atoi(key.Value)
+	if err == nil {
+		return nil, errors.New("Key cannot be a number")
 	}
 
 	value, ok := v.(resp.BulkString)
@@ -32,7 +40,36 @@ func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
 		return nil, errors.New("Invalid value type")
 	}
 
-	redisStore.SET(key.Value, store.Data{Value: value})
+	storageData := store.Data{Value: value}
+
+	specifics := make([]resp.BulkString, 0)
+
+	for _, val := range specs {
+		s, ok := val.(resp.BulkString)
+		if !ok {
+			return nil, errors.New("Invalid specs type")
+		}
+
+		specifics = append(specifics, s)
+	}
+
+	for i := 0; i < len(specifics); i += 2 {
+		if specifics[i].Value == "EX" {
+			val, err := strconv.Atoi(specifics[i+1].Value)
+			if err != nil {
+				return nil, err
+			}
+
+			// fmt.Println(val)
+			// fmt.Println(time.Now())
+
+			storageData.Expiry = time.Now().Add(time.Duration(val) * time.Second)
+		}
+	}
+
+	fmt.Println(storageData)
+
+	redisStore.SET(key.Value, storageData)
 
 	return resp.SimpleString{Value: "OK"}, nil
 }
@@ -56,11 +93,11 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	if !ok {
 		return nil, errors.New("Invalid key type")
 	}
-	
+
 	err := redisStore.DEL(key.Value)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return resp.SimpleString{Value: "OK"}, nil
 }

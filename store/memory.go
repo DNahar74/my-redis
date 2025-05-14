@@ -19,14 +19,14 @@ type Data struct {
 // Store is a map of keys to Data items
 type Store struct {
 	Items map[string]Data
-	Lock sync.RWMutex
+	Lock  sync.RWMutex
 }
 
 // CreateStorage initializes a new store instance
 func CreateStorage() *Store {
 	s := &Store{
 		Items: make(map[string]Data),
-		Lock: sync.RWMutex{},
+		Lock:  sync.RWMutex{},
 	}
 
 	return s
@@ -42,6 +42,12 @@ func (s *Store) GET(key string) (Data, error) {
 		return Data{}, errors.New("Key not found")
 	}
 
+	if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
+		// run a goroutine for deleting expired key also, it cannot be the default zero
+		go s.DEL(key)
+		return Data{}, errors.New("Expiration time has passed")
+	}
+
 	return data, nil
 }
 
@@ -54,11 +60,15 @@ func (s *Store) SET(key string, value Data) {
 }
 
 // DEL gets a key and deletes it from storage
-func (s *Store) DEL(key string) (error) {
+func (s *Store) DEL(key string) error {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 
-	if _, ok := s.Items[key]; ok {
+	if data, ok := s.Items[key]; ok {
+		if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
+			delete(s.Items, key)
+			return errors.New("Expiration time has passed")
+		}
 		delete(s.Items, key)
 		return nil
 	}

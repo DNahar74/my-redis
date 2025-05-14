@@ -17,7 +17,7 @@ func handleConnection(conn net.Conn) {
 	fmt.Println("address:", conn.RemoteAddr().String())
 	fmt.Println("")
 	defer conn.Close()
-	
+
 	buf := make([]byte, 128)
 
 	// keep reading the input until the client disconnects

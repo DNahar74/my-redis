@@ -13,7 +13,7 @@ var redisStore *store.Store
 
 // InitStore passes the RedisStore global variable's pointer for access in this package
 func InitStore(rs *store.Store) {
-  redisStore = rs
+	redisStore = rs
 }
 
 // HandleCommands takes a RESPType and handles it based on the command type
@@ -113,27 +113,34 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 				return v, nil
 			case "SET":
 				if len(str.Items) < 3 {
-          return nil, errors.New("SET requires a key and a value")
-        }
-        v, err := handleSET(str.Items[1], str.Items[2])
-				if err != nil {
-          return nil, err
-        }
-        return v, nil
+					return nil, errors.New("SET requires a key and a value")
+				} else if len(str.Items) == 3 {
+					v, err := handleSET(str.Items[1], str.Items[2])
+					if err != nil {
+						return nil, err
+					}
+					return v, nil
+				} else {
+					v, err := handleSET(str.Items[1], str.Items[2], str.Items[3:]...)
+					if err != nil {
+						return nil, err
+					}
+					return v, nil
+				}
 			case "GET":
 				if len(str.Items) < 2 {
-          return nil, errors.New("GET requires a key")
-        } else if len(str.Items) > 2 {
+					return nil, errors.New("GET requires a key")
+				} else if len(str.Items) > 2 {
 					return nil, errors.New("GET supports only one key")
 				}
-        v, err := handleGET(str.Items[1])
-        if err != nil {
-          return nil, err
-        }
-        return v, nil
+				v, err := handleGET(str.Items[1])
+				if err != nil {
+					return nil, err
+				}
+				return v, nil
 			case "DEL":
 				if len(str.Items) < 2 {
-          return nil, errors.New("DEL requires a key")
+					return nil, errors.New("DEL requires a key")
 				} else if len(str.Items) > 2 {
 					return nil, errors.New("DEL supports only one key")
 				}
