@@ -3,6 +3,7 @@
 package store
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -29,4 +30,38 @@ func CreateStorage() *Store {
 	}
 
 	return s
+}
+
+// GET gets a value for a key in the store
+func (s *Store) GET(key string) (Data, error) {
+	s.Lock.RLock()
+	defer s.Lock.RUnlock()
+
+	data, ok := s.Items[key]
+	if !ok {
+		return Data{}, errors.New("Key not found")
+	}
+
+	return data, nil
+}
+
+// SET gets a key-value pair and adds it to the storage
+func (s *Store) SET(key string, value Data) {
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+
+	s.Items[key] = value
+}
+
+// DEL gets a key and deletes it from storage
+func (s *Store) DEL(key string) (error) {
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+
+	if _, ok := s.Items[key]; ok {
+		delete(s.Items, key)
+		return nil
+	}
+
+	return errors.New("Key not found")
 }

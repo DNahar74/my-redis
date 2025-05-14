@@ -1,4 +1,3 @@
-// TODO: (1) Check for race condition in delete command
 //* ALWAYS DO THE LOCK BEFORE THE CHECK (TOCTOU BUG)
 
 package command
@@ -33,12 +32,7 @@ func handleSET(k, v resp.RESPType) (resp.RESPType, error) {
 		return nil, errors.New("Invalid value type")
 	}
 
-	//? Add a write lock to prevent reads/writes during a write
-	redisStore.Lock.Lock()
-	defer redisStore.Lock.Unlock()
-
-	redisStore.Items[key.Value] = store.Data{Value: value}
-	// redisStore.Items[key.Value] = store.Data{Value: value, Expiry: time.Now()}
+	redisStore.SET(key.Value, store.Data{Value: value})
 
 	return resp.SimpleString{Value: "OK"}, nil
 }
@@ -49,20 +43,12 @@ func handleGET(k resp.RESPType) (resp.RESPType, error) {
 		return nil, errors.New("Invalid key type")
 	}
 
-	//? Add a read lock to prevent writes during a read
-	//? It blocks writers but readers can proceed
-	redisStore.Lock.RLock()
-	defer redisStore.Lock.RUnlock()
-
-	if data, ok := redisStore.Items[key.Value]; ok {
-		// if data.Expiry.Before(time.Now()) {
-    //   delete(redisStore.Items, key.Value)
-    //   return nil, errors.New("Key expired")
-    // }
-		return data.Value, nil
+	data, err := redisStore.GET(key.Value)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("Key not found")
+	return data.Value, nil
 }
 
 func handleDEL(k resp.RESPType) (resp.RESPType, error) {
@@ -70,15 +56,11 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	if !ok {
 		return nil, errors.New("Invalid key type")
 	}
-	//? Add a write lock to prevent reads/writes during a delete
-	//? Always lock before the checks (TOCTOU - time of check to time of use bug)
-	redisStore.Lock.Lock()
-	defer redisStore.Lock.Unlock()
-
-	if _, ok := redisStore.Items[key.Value]; ok {
-		delete(redisStore.Items, key.Value)
-		return resp.SimpleString{Value: "OK"}, nil
+	
+	err := redisStore.DEL(key.Value)
+	if err != nil {
+		return nil, err
 	}
-
-	return nil, errors.New("Key not found")
+	
+	return resp.SimpleString{Value: "OK"}, nil
 }
