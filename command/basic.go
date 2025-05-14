@@ -1,4 +1,5 @@
 // TODO: (1) Check for race condition in delete command
+//* ALWAYS DO THE LOCK BEFORE THE CHECK (TOCTOU BUG)
 
 package command
 
@@ -69,13 +70,12 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	if !ok {
 		return nil, errors.New("Invalid key type")
 	}
+	//? Add a write lock to prevent reads/writes during a delete
+	//? Always lock before the checks (TOCTOU - time of check to time of use bug)
+	redisStore.Lock.Lock()
+	defer redisStore.Lock.Unlock()
 
 	if _, ok := redisStore.Items[key.Value]; ok {
-		//? Add a write lock to prevent reads/writes during a delete
-		//? Also, the existance of the key is checked before deleting (maybe an issue, if there is write then delete, but the order changes due to a race condition)
-		redisStore.Lock.Lock()
-		defer redisStore.Lock.Unlock()
-
 		delete(redisStore.Items, key.Value)
 		return resp.SimpleString{Value: "OK"}, nil
 	}
