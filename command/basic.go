@@ -54,7 +54,8 @@ func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error
 	}
 
 	for i := 0; i < len(specifics); i += 2 {
-		if specifics[i].Value == "EX" {
+		switch specifics[i].Value {
+		case "EX":
 			val, err := strconv.Atoi(specifics[i+1].Value)
 			if err != nil {
 				return nil, err
@@ -64,6 +65,8 @@ func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error
 			// fmt.Println(time.Now())
 
 			storageData.Expiry = time.Now().Add(time.Duration(val) * time.Second)
+		default:
+			return nil, errors.New("Unknown specifier")
 		}
 	}
 
