@@ -35,10 +35,10 @@ func CreateStorage() *Store {
 // GET gets a value for a key in the store
 func (s *Store) GET(key string) (Data, error) {
 	s.Lock.RLock()
-	defer s.Lock.RUnlock()
 
 	data, ok := s.Items[key]
 	if !ok {
+		s.Lock.RUnlock()
 		return Data{}, errors.New("Key not found")
 	}
 
@@ -58,6 +58,7 @@ func (s *Store) GET(key string) (Data, error) {
 		return Data{}, errors.New("Expiration time has passed")
 	}
 
+	s.Lock.RUnlock()
 	return data, nil
 }
 
