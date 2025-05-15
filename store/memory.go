@@ -44,7 +44,17 @@ func (s *Store) GET(key string) (Data, error) {
 
 	if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
 		// run a goroutine for deleting expired key also, it cannot be the default zero
-		go s.DEL(key)
+
+		//? Running a DEL goroutine has issues because it tries to upgrade a read lock to a write lock which is not safe or predictable
+		//? To prevent this release the read-lock, create a w-lock & delete
+		// go s.DEL(key)
+
+		s.Lock.RUnlock()
+
+		s.Lock.Lock()
+		delete(s.Items, key)
+		s.Lock.Unlock()
+
 		return Data{}, errors.New("Expiration time has passed")
 	}
 
