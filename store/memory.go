@@ -76,6 +76,7 @@ func (s *Store) DEL(key string) error {
 	defer s.Lock.Unlock()
 
 	if data, ok := s.Items[key]; ok {
+		//? The checking & deletion are in this order because it is impossible to check stuff after deletion
 		if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
 			delete(s.Items, key)
 			return errors.New("Expiration time has passed")
