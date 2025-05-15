@@ -186,6 +186,65 @@ func TestOverwriteValues(t *testing.T) {
 	}
 }
 
+func TestExpiryUpdate(t *testing.T) {
+	s := CreateStorage()
+	key := "key1"
+	data1 := Data{Value: resp.BulkString{Value: "val", Length: 3}, Expiry: time.Now().Add(1 * time.Second)}
+	data2 := Data{Value: resp.BulkString{Value: "val", Length: 3}, Expiry: time.Now().Add(5 * time.Second)}
+
+	s.SET(key, data1)
+	s.SET(key, data2)
+
+	time.Sleep(2 * time.Second)
+
+	_, err := s.GET(key)
+	if err != nil {
+		t.Errorf("Key should not have expired yet: %v", err)
+	}
+}
+
+func TestNoExpiry(t *testing.T) {
+	s := CreateStorage()
+	key := "keyNoExpiry"
+	data := Data{Value: resp.BulkString{Value: "permanent", Length: 9}}
+
+	s.SET(key, data)
+	time.Sleep(2 * time.Second)
+
+	_, err := s.GET(key)
+	if err != nil {
+		t.Errorf("Expected key to persist, but got error: %v", err)
+	}
+}
+
+func TestGetNonExistentKey(t *testing.T) {
+	s := CreateStorage()
+	_, err := s.GET("unknownKey")
+	if err == nil {
+		t.Errorf("Expected error for unknown key")
+	}
+}
+
+func TestDeleteNonExistentKey(t *testing.T) {
+	s := CreateStorage()
+	err := s.DEL("missingKey")
+	if err == nil {
+		t.Errorf("Expected error when deleting non-existent key")
+	}
+}
+
+func TestEmptyValue(t *testing.T) {
+	s := CreateStorage()
+	key := "emptyKey"
+	data := Data{Value: resp.BulkString{Value: "", Length: 0}}
+
+	s.SET(key, data)
+	res, err := s.GET(key)
+	if err != nil || res.Value.(resp.BulkString).Value != "" {
+		t.Errorf("Expected empty string, got %v", res.Value.(resp.BulkString).Value)
+	}
+}
+
 func BenchmarkGetSet(b *testing.B) {
 	s := CreateStorage()
 
