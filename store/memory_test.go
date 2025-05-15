@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -243,6 +244,51 @@ func TestEmptyValue(t *testing.T) {
 	if err != nil || res.Value.(resp.BulkString).Value != "" {
 		t.Errorf("Expected empty string, got %v", res.Value.(resp.BulkString).Value)
 	}
+}
+
+func TestConcurrentExpiry(t *testing.T) {
+	s := CreateStorage()
+
+	key := "expireKey"
+	data := Data{
+		Value:  resp.BulkString{Value: "value", Length: 5},
+		Expiry: time.Now().Add(1 * time.Second),
+	}
+	s.SET(key, data)
+
+	var wg sync.WaitGroup
+
+	for range 10000 {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			time.Sleep(2 * time.Second)
+			_, err := s.GET(key)
+			if err == nil {
+				t.Errorf("Error was expected, but value is accessible after expiry")
+			}
+		}()
+	}
+
+	wg.Wait()
+}
+
+func TestConcurrentSetGetDifferentKeys(t *testing.T) {
+	s := CreateStorage()
+	var wg sync.WaitGroup
+
+	for i := 0; i < 10000; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			key := fmt.Sprintf("key%d", i)
+			data := Data{Value: resp.BulkString{Value: "val", Length: 3}}
+			s.SET(key, data)
+			_, _ = s.GET(key)
+		}(i)
+	}
+	wg.Wait()
 }
 
 func BenchmarkGetSet(b *testing.B) {
