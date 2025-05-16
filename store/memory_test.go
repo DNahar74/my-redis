@@ -509,3 +509,42 @@ func BenchmarkSetDynamicKeysParallel(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkIncrement(b *testing.B) {
+	s := CreateStorage()
+
+	key := "benchmarkKey"
+	value := resp.BulkString{Value: "0", Length: len("0")}
+	data := Data{Value: value}
+	s.SET(key, data)
+
+	// Reset timer to exclude setup time
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := s.INCR(key)
+		if err != nil {
+			b.Fatalf("Unexpected error during INCR: %v", err)
+		}
+	}
+}
+
+func BenchmarkIncrementParallel(b *testing.B) {
+	s := CreateStorage()
+
+	key := "benchmarkKey"
+	value := resp.BulkString{Value: "0", Length: len("0")}
+	data := Data{Value: value}
+	s.SET(key, data)
+
+	b.ResetTimer()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, err := s.INCR(key)
+			if err != nil {
+				b.Fatalf("Unexpected error during parallel INCR: %v", err)
+			}
+		}
+	})
+}
