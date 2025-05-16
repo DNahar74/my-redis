@@ -52,7 +52,7 @@ git clone https://github.com/DNahar74/my-redis.git
 cd my-redis
 
 # Build the application
-go build -o my-redis
+go build -o my-redis.exe
 
 # Run the application
 ./my-redis
