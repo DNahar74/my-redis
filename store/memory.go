@@ -60,6 +60,14 @@ func (s *Store) GET(key string) (Data, error) {
 	}
 
 	s.Lock.RUnlock()
+
+	if iv, ok := data.Value.(resp.Integer); ok {
+		v := strconv.Itoa(iv.Value)
+		return Data{
+			Value: resp.BulkString{Value: v, Length: len(v)},
+			Expiry: data.Expiry,
+		}, nil
+	}
 	return data, nil
 }
 
@@ -99,18 +107,15 @@ func (s *Store) INCR(key string) (resp.RESPType, error) {
 			delete(s.Items, key)
 			return nil, errors.New("Expiration time has passed")
 		}
-		v := data.Value.(resp.BulkString).Value
-		val, err := strconv.Atoi(v)
-		if err != nil {
-			return nil, errors.New("Value is not an integer")
-		}
-		val++
-		sval := strconv.Itoa(val)
-		newBS := resp.BulkString{Value: sval, Length: len(sval)}
-		data.Value = newBS
-		s.Items[key] = data
 
-		return resp.Integer{Value: val}, nil
+		if val, ok := data.Value.(resp.Integer); ok {
+			val.Value++
+			data.Value = val
+			s.Items[key] = data
+			return val, nil
+		}
+
+		return nil, errors.New("Value is not an integer")
 	}
 
 	return nil, errors.New("Key not found")

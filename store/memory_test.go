@@ -295,7 +295,7 @@ func TestIncrement(t *testing.T) {
 	s := CreateStorage()
 
 	key := "incrementKey"
-	value := resp.BulkString{Value: "11", Length: len("11")}
+	value := resp.Integer{Value: 11}
 	data := Data{Value: value}
 
 	s.SET(key, data)
@@ -314,7 +314,7 @@ func TestIncrementNegative(t *testing.T) {
 	s := CreateStorage()
 
 	key := "incrementKey"
-	value := resp.BulkString{Value: "-11", Length: len("-11")}
+	value := resp.Integer{Value: -11}
 	data := Data{Value: value}
 
 	s.SET(key, data)
@@ -333,7 +333,7 @@ func TestIncrementExpiry(t *testing.T) {
 	s := CreateStorage()
 
 	key := "incrementKey"
-	value := resp.BulkString{Value: "11", Length: len("11")}
+	value := resp.Integer{Value: 11}
 	data := Data{
 		Value:  value,
 		Expiry: time.Now().Add(1 * time.Second),
@@ -359,7 +359,7 @@ func TestStringIncrement(t *testing.T) {
 
 	_, err := s.INCR(key)
 	if err == nil {
-		t.Errorf("Expected an errorincrementing a string value, but did not get an error")
+		t.Errorf("Expected an error incrementing a string value, but did not get an error")
 	}
 }
 
@@ -370,7 +370,7 @@ func TestIncrementConcurrently(t *testing.T) {
 	startVal := 11
 
 	key := "incrementKey"
-	value := resp.BulkString{Value: strconv.Itoa(startVal), Length: len(strconv.Itoa(startVal))}
+	value := resp.Integer{Value: startVal}
 	data := Data{Value: value}
 	s.SET(key, data)
 
@@ -514,7 +514,7 @@ func BenchmarkIncrement(b *testing.B) {
 	s := CreateStorage()
 
 	key := "benchmarkKey"
-	value := resp.BulkString{Value: "0", Length: len("0")}
+	value := resp.Integer{Value: 0}
 	data := Data{Value: value}
 	s.SET(key, data)
 
@@ -533,7 +533,7 @@ func BenchmarkIncrementParallel(b *testing.B) {
 	s := CreateStorage()
 
 	key := "benchmarkKey"
-	value := resp.BulkString{Value: "0", Length: len("0")}
+	value := resp.Integer{Value: 0}
 	data := Data{Value: value}
 	s.SET(key, data)
 

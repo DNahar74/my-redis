@@ -42,6 +42,11 @@ func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error
 
 	storageData := store.Data{Value: value}
 
+	val, err := strconv.Atoi(value.Value); 
+	if err == nil {
+		storageData.Value = resp.Integer{Value: val}
+	}
+
 	specifics := make([]resp.BulkString, 0)
 
 	for _, val := range specs {
