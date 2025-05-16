@@ -291,6 +291,116 @@ func TestConcurrentSetGetDifferentKeys(t *testing.T) {
 	wg.Wait()
 }
 
+func TestIncrement(t *testing.T) {
+	s := CreateStorage()
+
+	key := "incrementKey"
+	value := resp.BulkString{Value: "11", Length: len("11")}
+	data := Data{Value: value}
+
+	s.SET(key, data)
+
+	v, err := s.INCR(key)
+	if err != nil {
+		t.Errorf("Got an unexpected error incrementing key : %v", err)
+	}
+
+	if v.(resp.Integer).Value != 12 {
+		t.Errorf("Did not increment successfully")
+	}
+}
+
+func TestIncrementNegative(t *testing.T) {
+	s := CreateStorage()
+
+	key := "incrementKey"
+	value := resp.BulkString{Value: "-11", Length: len("-11")}
+	data := Data{Value: value}
+
+	s.SET(key, data)
+
+	v, err := s.INCR(key)
+	if err != nil {
+		t.Errorf("Got an unexpected error incrementing key : %v", err)
+	}
+
+	if v.(resp.Integer).Value != -10 {
+		t.Errorf("Did not increment successfully")
+	}
+}
+
+func TestIncrementExpiry(t *testing.T) {
+	s := CreateStorage()
+
+	key := "incrementKey"
+	value := resp.BulkString{Value: "11", Length: len("11")}
+	data := Data{
+		Value:  value,
+		Expiry: time.Now().Add(1 * time.Second),
+	}
+	s.SET(key, data)
+
+	time.Sleep(2 * time.Second)
+
+	_, err := s.INCR(key)
+	if err == nil {
+		t.Errorf("Expected error incrementing an expired key, but did not get an error")
+	}
+}
+
+func TestStringIncrement(t *testing.T) {
+	s := CreateStorage()
+
+	key := "incrementKey"
+	value := resp.BulkString{Value: "hello", Length: 5}
+	data := Data{Value: value}
+
+	s.SET(key, data)
+
+	_, err := s.INCR(key)
+	if err == nil {
+		t.Errorf("Expected an errorincrementing a string value, but did not get an error")
+	}
+}
+
+func TestIncrementConcurrently(t *testing.T) {
+	s := CreateStorage()
+	var wg sync.WaitGroup
+
+	startVal := 11
+
+	key := "incrementKey"
+	value := resp.BulkString{Value: strconv.Itoa(startVal), Length: len(strconv.Itoa(startVal))}
+	data := Data{Value: value}
+	s.SET(key, data)
+
+	intervals := 1000000
+
+	for range intervals {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, err := s.INCR(key)
+			if err != nil {
+				t.Errorf("Got an unexpected error incrementing key : %v", err)
+			}
+		}()
+	}
+	wg.Wait()
+
+	v, err := s.INCR(key)
+	if err != nil {
+		t.Errorf("Got an unexpected error incrementing key : %v", err)
+	}
+
+	final := v.(resp.Integer).Value
+	expected := startVal + intervals + 1
+
+	if final != expected {
+		t.Errorf("Expected %d, got %d", expected, final)
+	}
+}
+
 func BenchmarkGetSet(b *testing.B) {
 	s := CreateStorage()
 
