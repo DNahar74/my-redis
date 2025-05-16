@@ -1,4 +1,5 @@
 //TODO: (1) Review this memory storage & access
+//TODO: (2) Change all the data storage from copies to pointer references. make Data.value a pointer to resp.RESPType
 
 package store
 

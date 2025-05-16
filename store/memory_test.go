@@ -408,6 +408,9 @@ func BenchmarkGetSet(b *testing.B) {
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
 
+	// Reset timer to exclude setup time
+	b.ResetTimer()
+
 	for range b.N {
 		s.SET(key, data)
 		_, err := s.GET(key)
@@ -423,6 +426,9 @@ func BenchmarkGetSetDynamicKeys(b *testing.B) {
 	key := "benchmarkKey"
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
+
+	// Reset timer to exclude setup time
+	b.ResetTimer()
 
 	for i := range b.N {
 		s.SET(key+strconv.Itoa(i), data)
@@ -442,6 +448,9 @@ func BenchmarkGet(b *testing.B) {
 
 	s.SET(key, data)
 
+	// Reset timer to exclude setup time
+	b.ResetTimer()
+
 	for range b.N {
 		_, err := s.GET(key)
 		if err != nil {
@@ -457,6 +466,9 @@ func BenchmarkSet(b *testing.B) {
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
 
+	// Reset timer to exclude setup time
+	b.ResetTimer()
+
 	for range b.N {
 		s.SET(key, data)
 	}
@@ -469,6 +481,9 @@ func BenchmarkSetDynamicKeys(b *testing.B) {
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
 
+	// Reset timer to exclude setup time
+	b.ResetTimer()
+
 	for i := range b.N {
 		s.SET(key+strconv.Itoa(i), data)
 	}
@@ -479,6 +494,9 @@ func BenchmarkSetSameKeyParallel(b *testing.B) {
 	key := "trialkey"
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
+
+	// Reset timer to exclude setup time
+	b.ResetTimer()
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
@@ -493,6 +511,9 @@ func BenchmarkSetDynamicKeysParallel(b *testing.B) {
 	data := Data{Value: value}
 
 	var counter uint64
+
+	// Reset timer to exclude setup time
+	b.ResetTimer()
 
 	//? Always create locally changing variables inside goroutines
 	b.RunParallel(func(pb *testing.PB) {
