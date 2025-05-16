@@ -104,3 +104,17 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 
 	return resp.SimpleString{Value: "OK"}, nil
 }
+
+func handleIncr(k resp.RESPType) (resp.RESPType, error) {
+	key, ok := k.(resp.BulkString)
+	if !ok {
+		return nil, errors.New("Invalid key type")
+	}
+
+	val, err := redisStore.INCR(key.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return val, nil
+}

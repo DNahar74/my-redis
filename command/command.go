@@ -149,6 +149,17 @@ func handleArray(command resp.RESPType) (resp.RESPType, error) {
 					return nil, err
 				}
 				return v, nil
+			case "INCR":
+				if len(str.Items) < 2 {
+					return nil, errors.New("INCR requires a key")
+				} else if len(str.Items) > 2 {
+					return nil, errors.New("INCR supports only one key")
+				}
+				v, err := handleIncr(str.Items[1])
+				if err != nil {
+					return nil, err
+				}
+				return v, nil
 			default:
 				return nil, errors.New("Unknown Command")
 			}

@@ -4,6 +4,7 @@ package store
 
 import (
 	"errors"
+	"strconv"
 	"sync"
 	"time"
 
@@ -86,4 +87,31 @@ func (s *Store) DEL(key string) error {
 	}
 
 	return errors.New("Key not found")
+}
+
+// INCR increments the value of a key
+func (s *Store) INCR(key string) (resp.RESPType, error) {
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+
+	if data, ok := s.Items[key]; ok {
+		if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
+			delete(s.Items, key)
+			return nil, errors.New("Expiration time has passed")
+		}
+		v := data.Value.(resp.BulkString).Value
+		val, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, errors.New("Value is not an integer")
+		}
+		val++
+		sval := strconv.Itoa(val)
+		newBS := resp.BulkString{Value: sval, Length: len(sval)}
+		data.Value = newBS
+		s.Items[key] = data
+
+		return resp.Integer{Value: val}, nil
+	}
+
+	return nil, errors.New("Key not found")
 }
