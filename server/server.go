@@ -38,6 +38,7 @@ func (s *Server) Start() error {
 	}
 
 	go handleAOF(RedisStore)
+	go handleMemoryState(RedisStore)
 
 	// Allow multiple connections
 	for {
