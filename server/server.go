@@ -32,6 +32,13 @@ func (s *Server) Start() error {
 	var RedisStore = store.CreateStorage()
 	command.InitStore(RedisStore)
 
+	err = restoreStorage()
+	if err != nil {
+		return err
+	}
+
+	go handleAOF(RedisStore)
+
 	// Allow multiple connections
 	for {
 		conn, err := listener.Accept()
@@ -41,6 +48,6 @@ func (s *Server) Start() error {
 		}
 
 		// make a goroutine for handling R/W
-		go handleConnection(conn)
+		go handleConnection(conn, RedisStore)
 	}
 }

@@ -20,8 +20,9 @@ type Data struct {
 
 // Store is a map of keys to Data items
 type Store struct {
-	Items map[string]Data
-	Lock  sync.RWMutex
+	Items   map[string]Data
+	Lock    sync.RWMutex
+	AOFChan chan string
 }
 
 // CreateStorage initializes a new store instance
@@ -29,6 +30,7 @@ func CreateStorage() *Store {
 	s := &Store{
 		Items: make(map[string]Data),
 		Lock:  sync.RWMutex{},
+		AOFChan: make(chan string, 100000),	// 100000 ops/sec
 	}
 
 	return s
@@ -65,7 +67,7 @@ func (s *Store) GET(key string) (Data, error) {
 	if iv, ok := data.Value.(resp.Integer); ok {
 		v := strconv.Itoa(iv.Value)
 		return Data{
-			Value: resp.BulkString{Value: v, Length: len(v)},
+			Value:  resp.BulkString{Value: v, Length: len(v)},
 			Expiry: data.Expiry,
 		}, nil
 	}

@@ -6,13 +6,14 @@ import (
 
 	"github.com/DNahar74/my-redis/command"
 	"github.com/DNahar74/my-redis/resp"
+	"github.com/DNahar74/my-redis/store"
 	"github.com/DNahar74/my-redis/utils"
 )
 
 // RedisStore is a global variable to hold the Redis data store
 
 // handleConnection takes the connecton request for a client and handles the input and output
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn, s *store.Store) {
 	fmt.Println("Client connected")
 	fmt.Println("address:", conn.RemoteAddr().String())
 	fmt.Println("")
@@ -58,6 +59,8 @@ func handleConnection(conn net.Conn) {
 			utils.SendMessage(conn, m)
 			continue
 		}
+
+		s.AOFChan <- cmd
 
 		err = utils.SendMessage(conn, val)
 		if err != nil {
