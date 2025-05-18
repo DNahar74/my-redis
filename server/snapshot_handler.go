@@ -20,12 +20,16 @@ func handleFile(s *store.Store) {
 	content := ""
 
 	for key, value := range s.Items {
-		content += key + " => \t"
-		str, err := value.Value.Serialize()
-		if err != nil {
-			return
+		if value.Expiry.IsZero() || value.Expiry.After(time.Now()) {
+			content += key + " => \t"
+			str, err := value.Value.Serialize()
+			if err != nil {
+				return
+			}
+			content += str
+		} else {
+			s.DEL(key)
 		}
-		content += str
 	}
 
 	if len(content) > 0 {
