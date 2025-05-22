@@ -9,29 +9,17 @@ import (
 	"strings"
 )
 
-// GetCommands extracts all commands from the input string and returns them as a slice of strings
-func GetCommands(buf []byte) []string {
-	val := string(buf)
-	val = strings.ToUpper(val)
-
-	inputs := strings.Split(val, "\r\n")
-
-	fmt.Println("input array: ", inputs)
-
-	return inputs
-}
-
 // Deserialize takes a command as input and deserializes it
 func Deserialize(cmds string) (Type, error) {
 	// Empty command
 	command := strings.Trim(cmds, " ")
 	if len(command) == 0 {
-		return nil, errors.New("Empty input")
+		return nil, errors.New("empty input")
 	}
 
 	// No CRLF
 	if !strings.HasSuffix(command, "\r\n") {
-		return nil, errors.New("No CRLF")
+		return nil, errors.New("no CRLF")
 	}
 
 	// Remove the last "\r\n" to remove an extra "" in the inputs array
@@ -40,7 +28,7 @@ func Deserialize(cmds string) (Type, error) {
 	// No commands
 	inputs := strings.Split(command, "\r\n")
 	if len(inputs) == 0 {
-		return nil, errors.New("Invalid input")
+		return nil, errors.New("invalid input")
 	}
 
 	for i := range len(inputs) {
@@ -78,7 +66,7 @@ func Deserialize(cmds string) (Type, error) {
 			}
 			return val, nil
 		default:
-			return nil, errors.New("Invalid datatype")
+			return nil, errors.New("invalid datatype")
 		}
 	}
 
@@ -88,7 +76,7 @@ func Deserialize(cmds string) (Type, error) {
 // DeserializeSimpleString returns a simpleString with value stored in it
 func DeserializeSimpleString(command string) (SimpleString, error) {
 	if command[0] != '+' {
-		return SimpleString{}, errors.New("Not SimpleString datatype")
+		return SimpleString{}, errors.New("not SimpleString datatype")
 	}
 	s := SimpleString{Value: command[1:]}
 	return s, nil
@@ -97,7 +85,7 @@ func DeserializeSimpleString(command string) (SimpleString, error) {
 // DeserializeSimpleError returns a simpleError with value stored in it
 func DeserializeSimpleError(command string) (SimpleError, error) {
 	if command[0] != '-' {
-		return SimpleError{}, errors.New("Not SimpleError datatype")
+		return SimpleError{}, errors.New("not SimpleError datatype")
 	}
 	s := SimpleError{Value: command[1:]}
 	return s, nil
@@ -106,7 +94,7 @@ func DeserializeSimpleError(command string) (SimpleError, error) {
 // DeserializeInteger returns an Integer with value stored in it
 func DeserializeInteger(command string) (Integer, error) {
 	if command[0] != ':' {
-		return Integer{}, errors.New("Not Integer datatype")
+		return Integer{}, errors.New("not Integer datatype")
 	}
 	val := command[1:]
 	num, err := strconv.Atoi(val)
@@ -120,7 +108,7 @@ func DeserializeInteger(command string) (Integer, error) {
 // DeserializeBulkString returns a BulkString with value stored in it
 func DeserializeBulkString(commands []string) (BulkString, int, error) {
 	if commands[0][0] != '$' {
-		return BulkString{}, 0, errors.New("Not a BulkString datatype")
+		return BulkString{}, 0, errors.New("not a BulkString datatype")
 	}
 	val := commands[0][1:]
 	bsLen, err := strconv.Atoi(val)
@@ -139,7 +127,7 @@ func DeserializeBulkString(commands []string) (BulkString, int, error) {
 
 	for _, v := range commands[1:] {
 		if len(v) > bsLen {
-			return BulkString{}, 0, errors.New("Invalid Bulk String: length mismatch")
+			return BulkString{}, 0, errors.New("invalid Bulk String: length mismatch")
 		} else if len(v) == bsLen {
 			str += v
 			elementsUsed++
@@ -167,7 +155,7 @@ func DeserializeBulkString(commands []string) (BulkString, int, error) {
 // DeserializeArray returns an Array with value stored in it
 func DeserializeArray(commands []string) (Array, int, error) {
 	if len(commands) == 0 || commands[0][0] != '*' {
-		return Array{}, 0, errors.New("Not an Array datatype")
+		return Array{}, 0, errors.New("not an Array datatype")
 	}
 
 	// Extract array length
@@ -195,7 +183,7 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		}
 
 		data[i] = v
-		index += (el + 1)
+		index += el + 1
 		elements++
 	}
 
@@ -203,7 +191,7 @@ func DeserializeArray(commands []string) (Array, int, error) {
 		return Array{Length: arrLen, Items: data}, arrLen + 1, nil
 	}
 
-	return Array{}, 0, errors.New("Invalid Array: length mismatch")
+	return Array{}, 0, errors.New("invalid Array: length mismatch")
 }
 
 func addCRLF(commands []string) string {
@@ -220,12 +208,12 @@ func deserializeCommand(cmds string) (Type, int, error) {
 	// Empty command
 	command := strings.Trim(cmds, " ")
 	if len(command) == 0 {
-		return nil, 0, errors.New("Empty input")
+		return nil, 0, errors.New("empty input")
 	}
 
 	// No CRLF
 	if !strings.HasSuffix(command, "\r\n") {
-		return nil, 0, errors.New("No CRLF")
+		return nil, 0, errors.New("no CRLF")
 	}
 
 	// Remove the last "\r\n" to remove an extra "" in the inputs array
@@ -234,7 +222,7 @@ func deserializeCommand(cmds string) (Type, int, error) {
 	// No commands
 	inputs := strings.Split(command, "\r\n")
 	if len(inputs) == 0 {
-		return nil, 0, errors.New("Invalid input")
+		return nil, 0, errors.New("invalid input")
 	}
 
 	for i := 0; i < len(inputs); i++ {
@@ -273,9 +261,9 @@ func deserializeCommand(cmds string) (Type, int, error) {
 			return val, el, nil
 		default:
 			fmt.Println("v[0] :", v[0])
-			return nil, 0, errors.New("Invalid datatype my")
+			return nil, 0, errors.New("invalid datatype")
 		}
 	}
 
-	return nil, 0, errors.New("Internal Error")
+	return nil, 0, errors.New("internal Error")
 }
