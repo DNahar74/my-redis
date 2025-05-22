@@ -28,21 +28,20 @@ func handleFile(s *store.Store) {
 			}
 			content += str
 		} else {
-			s.DEL(key)
+			err := s.DEL(key)
+			if err != nil {
+				fmt.Println("error deleting in background worker:", err)
+				return
+			}
 		}
 	}
 
 	if len(content) > 0 {
-		// _, err := os.Open("./memory.aof")
-		// if err != nil {
 		file, err := os.Create("./memory.dat")
 		if err != nil {
 			fmt.Println("Error creating file")
 			return
 		}
-		// fmt.Println("File created")
-		// return
-		// }
 		_, err = io.WriteString(file, content)
 		if err != nil {
 			return
