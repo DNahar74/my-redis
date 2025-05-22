@@ -12,12 +12,17 @@ import (
 
 // RedisStore is a global variable to hold the Redis data store
 
-// handleConnection takes the connecton request for a client and handles the input and output
+// handleConnection takes the connection request for a client and handles the input and output
 func handleConnection(conn net.Conn, s *store.Store) {
 	fmt.Println("Client connected")
 	fmt.Println("address:", conn.RemoteAddr().String())
 	fmt.Println("")
-	defer conn.Close()
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+			fmt.Println("Error closing the connection:", err)
+		}
+	}(conn)
 
 	buf := make([]byte, 128)
 
@@ -48,7 +53,11 @@ func handleConnection(conn net.Conn, s *store.Store) {
 		if err != nil {
 			fmt.Println("Error deserializing commands: ", err.Error())
 			m := resp.SimpleError{Value: err.Error()}
-			utils.SendMessage(conn, m)
+			err := utils.SendMessage(conn, m)
+			if err != nil {
+				fmt.Println("Error sending response: ", err.Error())
+				return
+			}
 			continue
 		}
 
@@ -56,7 +65,11 @@ func handleConnection(conn net.Conn, s *store.Store) {
 		if err != nil {
 			fmt.Println("Error handling commands: ", err.Error())
 			m := resp.SimpleError{Value: err.Error()}
-			utils.SendMessage(conn, m)
+			err := utils.SendMessage(conn, m)
+			if err != nil {
+				fmt.Println("Error sending response: ", err.Error())
+				return
+			}
 			continue
 		}
 
