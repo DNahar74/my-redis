@@ -25,7 +25,12 @@ func (s *Server) Start() error {
 		fmt.Println("Error starting the listener:", err)
 		return err
 	}
-	defer listener.Close()
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+			fmt.Println("Error closing the listener:", err)
+		}
+	}(listener)
 
 	fmt.Println("Server listening on port 6379")
 
