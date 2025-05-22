@@ -70,28 +70,28 @@ func handleSimpleString(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.SimpleString); ok {
 		return str, nil
 	}
-	return nil, errors.New("Invalid datatype")
+	return nil, errors.New("invalid datatype")
 }
 
 func handleSimpleError(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.SimpleError); ok {
 		return str, nil
 	}
-	return nil, errors.New("Invalid datatype")
+	return nil, errors.New("invalid datatype")
 }
 
 func handleInteger(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.Integer); ok {
 		return str, nil
 	}
-	return nil, errors.New("Invalid datatype")
+	return nil, errors.New("invalid datatype")
 }
 
 func handleBulkString(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.BulkString); ok {
 		return str, nil
 	}
-	return nil, errors.New("Invalid datatype")
+	return nil, errors.New("invalid datatype")
 }
 
 func handleArray(command resp.Type) (resp.Type, error) {
@@ -161,10 +161,10 @@ func handleArray(command resp.Type) (resp.Type, error) {
 				}
 				return v, nil
 			default:
-				return nil, errors.New("Unknown Command")
+				return nil, errors.New("unknown Command")
 			}
 		}
-		return nil, errors.New("Not a valid command format")
+		return nil, errors.New("not a valid command format")
 	}
-	return nil, errors.New("Invalid datatype")
+	return nil, errors.New("invalid datatype")
 }

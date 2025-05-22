@@ -21,23 +21,23 @@ func handleECHO(value resp.Type) (resp.Type, error) {
 		return resp.BulkString{Value: cmd.Value, Length: len(cmd.Value)}, nil
 	}
 
-	return nil, errors.New("Invalid input type")
+	return nil, errors.New("invalid input type")
 }
 
 func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
-		return nil, errors.New("Invalid key type")
+		return nil, errors.New("invalid key type")
 	}
 
 	_, err := strconv.Atoi(key.Value)
 	if err == nil {
-		return nil, errors.New("Key cannot be a number")
+		return nil, errors.New("key cannot be a number")
 	}
 
 	value, ok := v.(resp.BulkString)
 	if !ok {
-		return nil, errors.New("Invalid value type")
+		return nil, errors.New("invalid value type")
 	}
 
 	storageData := store.Data{Value: value}
@@ -52,7 +52,7 @@ func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 	for _, val := range specs {
 		s, ok := val.(resp.BulkString)
 		if !ok {
-			return nil, errors.New("Invalid specs type")
+			return nil, errors.New("invalid specs type")
 		}
 
 		specifics = append(specifics, s)
@@ -71,7 +71,7 @@ func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 
 			storageData.Expiry = time.Now().Add(time.Duration(val) * time.Second)
 		default:
-			return nil, errors.New("Unknown specifier")
+			return nil, errors.New("unknown specifier")
 		}
 	}
 
@@ -85,7 +85,7 @@ func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 func handleGET(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
-		return nil, errors.New("Invalid key type")
+		return nil, errors.New("invalid key type")
 	}
 
 	data, err := redisStore.GET(key.Value)
@@ -99,7 +99,7 @@ func handleGET(k resp.Type) (resp.Type, error) {
 func handleDEL(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
-		return nil, errors.New("Invalid key type")
+		return nil, errors.New("invalid key type")
 	}
 
 	err := redisStore.DEL(key.Value)
@@ -113,7 +113,7 @@ func handleDEL(k resp.Type) (resp.Type, error) {
 func handleIncr(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
-		return nil, errors.New("Invalid key type")
+		return nil, errors.New("invalid key type")
 	}
 
 	val, err := redisStore.INCR(key.Value)
