@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// RESPType represents an interface that is extended by all other RSPE data types
-type RESPType interface {
+// Type represents an interface that is extended by all other RESP data types
+type Type interface {
 	Serialize() (string, error)
 }
 
@@ -102,7 +102,7 @@ func (bs BulkString) Serialize() (string, error) {
 // Array returns an array in RESP
 type Array struct {
 	Length int
-	Items  []RESPType
+	Items  []Type
 }
 
 // Serialize returns the RESP serialization of the array, and an error

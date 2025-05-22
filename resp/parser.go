@@ -22,7 +22,7 @@ func GetCommands(buf []byte) []string {
 }
 
 // Deserialize takes a command as input and deserializes it
-func Deserialize(cmds string) (RESPType, error) {
+func Deserialize(cmds string) (Type, error) {
 	// Empty command
 	command := strings.Trim(cmds, " ")
 	if len(command) == 0 {
@@ -180,10 +180,10 @@ func DeserializeArray(commands []string) (Array, int, error) {
 
 	// Handle empty array
 	if arrLen == 0 {
-		return Array{Length: 0, Items: []RESPType{}}, 1, nil
+		return Array{Length: 0, Items: []Type{}}, 1, nil
 	}
 
-	data := make([]RESPType, arrLen)
+	data := make([]Type, arrLen)
 	elements := 0
 	index := 0 // Handling the indexes in CMDS array
 
@@ -216,7 +216,7 @@ func addCRLF(commands []string) string {
 	return str
 }
 
-func deserializeCommand(cmds string) (RESPType, int, error) {
+func deserializeCommand(cmds string) (Type, int, error) {
 	// Empty command
 	command := strings.Trim(cmds, " ")
 	if len(command) == 0 {

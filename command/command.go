@@ -16,8 +16,8 @@ func InitStore(rs *store.Store) {
 	redisStore = rs
 }
 
-// HandleCommands takes a RESPType and handles it based on the command type
-func HandleCommands(commands resp.RESPType) (resp.RESPType, error) {
+// HandleCommands takes a Type and handles it based on the command type
+func HandleCommands(commands resp.Type) (resp.Type, error) {
 	switch commands.(type) {
 	case resp.SimpleString:
 		val, err := handleSimpleString(commands)
@@ -66,35 +66,35 @@ func HandleCommands(commands resp.RESPType) (resp.RESPType, error) {
 	return nil, nil
 }
 
-func handleSimpleString(command resp.RESPType) (resp.RESPType, error) {
+func handleSimpleString(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.SimpleString); ok {
 		return str, nil
 	}
 	return nil, errors.New("Invalid datatype")
 }
 
-func handleSimpleError(command resp.RESPType) (resp.RESPType, error) {
+func handleSimpleError(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.SimpleError); ok {
 		return str, nil
 	}
 	return nil, errors.New("Invalid datatype")
 }
 
-func handleInteger(command resp.RESPType) (resp.RESPType, error) {
+func handleInteger(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.Integer); ok {
 		return str, nil
 	}
 	return nil, errors.New("Invalid datatype")
 }
 
-func handleBulkString(command resp.RESPType) (resp.RESPType, error) {
+func handleBulkString(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.BulkString); ok {
 		return str, nil
 	}
 	return nil, errors.New("Invalid datatype")
 }
 
-func handleArray(command resp.RESPType) (resp.RESPType, error) {
+func handleArray(command resp.Type) (resp.Type, error) {
 	if str, ok := command.(resp.Array); ok {
 		// If the command is an array, check if the first element is a BulkString(all command names are BulkStrings)
 		if cmd, ok := str.Items[0].(resp.BulkString); ok {

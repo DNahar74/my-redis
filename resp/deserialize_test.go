@@ -9,7 +9,7 @@ func TestDeserializeSimpleString(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    RESPType
+		want    Type
 		wantErr bool
 	}{
 		{
@@ -48,7 +48,7 @@ func TestDeserializeSimpleError(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    RESPType
+		want    Type
 		wantErr bool
 	}{
 		{
@@ -87,7 +87,7 @@ func TestDeserializeInteger(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    RESPType
+		want    Type
 		wantErr bool
 	}{
 		{
@@ -138,7 +138,7 @@ func TestDeserializeBulkString(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    RESPType
+		want    Type
 		wantErr bool
 	}{
 		{
@@ -199,7 +199,7 @@ func TestDeserializeArray(t *testing.T) {
 			input: "*2\r\n:123\r\n$5\r\nhello\r\n",
 			want: Array{
 				Length: 2,
-				Items:  []RESPType{Integer{Value: 123}, BulkString{Value: "hello", Length: 5}},
+				Items:  []Type{Integer{Value: 123}, BulkString{Value: "hello", Length: 5}},
 			},
 			wantErr: false,
 		},
@@ -208,7 +208,7 @@ func TestDeserializeArray(t *testing.T) {
 			input: "*0\r\n",
 			want: Array{
 				Length: 0,
-				Items:  []RESPType{},
+				Items:  []Type{},
 			},
 			wantErr: false,
 		},
@@ -217,11 +217,11 @@ func TestDeserializeArray(t *testing.T) {
 			input: "*2\r\n:1\r\n*2\r\n:2\r\n$4\r\ntest\r\n",
 			want: Array{
 				Length: 2,
-				Items: []RESPType{
+				Items: []Type{
 					Integer{Value: 1},
 					Array{
 						Length: 2,
-						Items:  []RESPType{Integer{Value: 2}, BulkString{Value: "test", Length: 4}},
+						Items:  []Type{Integer{Value: 2}, BulkString{Value: "test", Length: 4}},
 					},
 				},
 			},

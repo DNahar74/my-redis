@@ -1,5 +1,5 @@
 //TODO: (1) Review this memory storage & access
-//TODO: (2) Change all the data storage from copies to pointer references. make Data.value a pointer to resp.RESPType
+//TODO: (2) Change all the data storage from copies to pointer references. make Data.value a pointer to resp.Type
 
 package store
 
@@ -14,7 +14,7 @@ import (
 
 // Data represents a key-value pair in the store
 type Data struct {
-	Value  resp.RESPType
+	Value  resp.Type
 	Expiry time.Time
 }
 
@@ -101,7 +101,7 @@ func (s *Store) DEL(key string) error {
 }
 
 // INCR increments the value of a key
-func (s *Store) INCR(key string) (resp.RESPType, error) {
+func (s *Store) INCR(key string) (resp.Type, error) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 

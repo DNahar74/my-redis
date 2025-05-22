@@ -12,11 +12,11 @@ import (
 	"github.com/DNahar74/my-redis/store"
 )
 
-func handlePING() resp.RESPType {
+func handlePING() resp.Type {
 	return resp.SimpleString{Value: "PONG"}
 }
 
-func handleECHO(value resp.RESPType) (resp.RESPType, error) {
+func handleECHO(value resp.Type) (resp.Type, error) {
 	if cmd, ok := value.(resp.BulkString); ok {
 		return resp.BulkString{Value: cmd.Value, Length: len(cmd.Value)}, nil
 	}
@@ -24,7 +24,7 @@ func handleECHO(value resp.RESPType) (resp.RESPType, error) {
 	return nil, errors.New("Invalid input type")
 }
 
-func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error) {
+func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
 		return nil, errors.New("Invalid key type")
@@ -42,7 +42,7 @@ func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error
 
 	storageData := store.Data{Value: value}
 
-	val, err := strconv.Atoi(value.Value); 
+	val, err := strconv.Atoi(value.Value)
 	if err == nil {
 		storageData.Value = resp.Integer{Value: val}
 	}
@@ -82,7 +82,7 @@ func handleSET(k, v resp.RESPType, specs ...resp.RESPType) (resp.RESPType, error
 	return resp.SimpleString{Value: "OK"}, nil
 }
 
-func handleGET(k resp.RESPType) (resp.RESPType, error) {
+func handleGET(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
 		return nil, errors.New("Invalid key type")
@@ -96,7 +96,7 @@ func handleGET(k resp.RESPType) (resp.RESPType, error) {
 	return data.Value, nil
 }
 
-func handleDEL(k resp.RESPType) (resp.RESPType, error) {
+func handleDEL(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
 		return nil, errors.New("Invalid key type")
@@ -110,7 +110,7 @@ func handleDEL(k resp.RESPType) (resp.RESPType, error) {
 	return resp.SimpleString{Value: "OK"}, nil
 }
 
-func handleIncr(k resp.RESPType) (resp.RESPType, error) {
+func handleIncr(k resp.Type) (resp.Type, error) {
 	key, ok := k.(resp.BulkString)
 	if !ok {
 		return nil, errors.New("Invalid key type")
