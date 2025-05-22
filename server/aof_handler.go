@@ -55,7 +55,11 @@ func restoreStorage() error {
 			fmt.Println("Error in cmd", i)
 			return err
 		}
-		command.HandleCommands(cmd)
+		_, err = command.HandleCommands(cmd)
+		if err != nil {
+			fmt.Println("Error in restoring storage. Cmd:", i)
+			return err
+		}
 	}
 
 	return nil
