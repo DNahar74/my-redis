@@ -28,9 +28,9 @@ type Store struct {
 // CreateStorage initializes a new store instance
 func CreateStorage() *Store {
 	s := &Store{
-		Items: make(map[string]Data),
-		Lock:  sync.RWMutex{},
-		AOFChan: make(chan string, 100000),	// 100000 ops/sec
+		Items:   make(map[string]Data),
+		Lock:    sync.RWMutex{},
+		AOFChan: make(chan string, 100000), // 100000 ops/sec
 	}
 
 	return s
@@ -43,7 +43,7 @@ func (s *Store) GET(key string) (Data, error) {
 	data, ok := s.Items[key]
 	if !ok {
 		s.Lock.RUnlock()
-		return Data{}, errors.New("Key not found")
+		return Data{}, errors.New("key not found")
 	}
 
 	if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
@@ -59,7 +59,7 @@ func (s *Store) GET(key string) (Data, error) {
 		delete(s.Items, key)
 		s.Lock.Unlock()
 
-		return Data{}, errors.New("Expiration time has passed")
+		return Data{}, errors.New("expiration time has passed")
 	}
 
 	s.Lock.RUnlock()
@@ -91,13 +91,13 @@ func (s *Store) DEL(key string) error {
 		//? The checking & deletion are in this order because it is impossible to check stuff after deletion
 		if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
 			delete(s.Items, key)
-			return errors.New("Expiration time has passed")
+			return errors.New("expiration time has passed")
 		}
 		delete(s.Items, key)
 		return nil
 	}
 
-	return errors.New("Key not found")
+	return errors.New("key not found")
 }
 
 // INCR increments the value of a key
@@ -108,7 +108,7 @@ func (s *Store) INCR(key string) (resp.RESPType, error) {
 	if data, ok := s.Items[key]; ok {
 		if !data.Expiry.IsZero() && data.Expiry.Before(time.Now()) {
 			delete(s.Items, key)
-			return nil, errors.New("Expiration time has passed")
+			return nil, errors.New("expiration time has passed")
 		}
 
 		if val, ok := data.Value.(resp.Integer); ok {
@@ -118,8 +118,8 @@ func (s *Store) INCR(key string) (resp.RESPType, error) {
 			return val, nil
 		}
 
-		return nil, errors.New("Value is not an integer")
+		return nil, errors.New("value is not an integer")
 	}
 
-	return nil, errors.New("Key not found")
+	return nil, errors.New("key not found")
 }

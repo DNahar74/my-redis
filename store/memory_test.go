@@ -12,7 +12,7 @@ import (
 	"github.com/DNahar74/my-redis/resp"
 )
 
-func TestGetandSet(t *testing.T) {
+func TestGetAndSet(t *testing.T) {
 	s := CreateStorage()
 
 	key := "testKey"
@@ -54,9 +54,9 @@ func TestExpiry(t *testing.T) {
 
 func TestBulkExpiry(t *testing.T) {
 	s := CreateStorage()
-	numkeys := 100000
+	numKeys := 100000
 
-	for i := range numkeys {
+	for i := range numKeys {
 		key := "key" + strconv.Itoa(i+1)
 		val := "value" + strconv.Itoa(i+1)
 		value := resp.BulkString{Value: val, Length: len(val)}
@@ -71,7 +71,7 @@ func TestBulkExpiry(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	for i := range numkeys {
+	for i := range numKeys {
 		key := "key" + strconv.Itoa(i+1)
 		_, err := s.GET(key)
 		if err == nil {
@@ -96,7 +96,7 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestGetafterDelete(t *testing.T) {
+func TestGetAfterDelete(t *testing.T) {
 	s := CreateStorage()
 
 	key := "testKey"
@@ -119,9 +119,9 @@ func TestGetafterDelete(t *testing.T) {
 
 func TestBulkDeleteExpiry(t *testing.T) {
 	s := CreateStorage()
-	numkeys := 100000
+	numKeys := 100000
 
-	for i := range numkeys {
+	for i := range numKeys {
 		key := "key" + strconv.Itoa(i+1)
 		val := "value" + strconv.Itoa(i+1)
 		value := resp.BulkString{Value: val, Length: len(val)}
@@ -136,7 +136,7 @@ func TestBulkDeleteExpiry(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	for i := range numkeys {
+	for i := range numKeys {
 		key := "key" + strconv.Itoa(i+1)
 		err := s.DEL(key)
 		if err == nil {
@@ -158,7 +158,10 @@ func TestConcurrentAccess(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			s.GET(key)
+			_, err := s.GET(key)
+			if err != nil {
+				t.Errorf("There was an error getting the key: %v", err)
+			}
 		}()
 	}
 	wg.Wait()
@@ -491,7 +494,7 @@ func BenchmarkSetDynamicKeys(b *testing.B) {
 
 func BenchmarkSetSameKeyParallel(b *testing.B) {
 	s := CreateStorage()
-	key := "trialkey"
+	key := "trial key"
 	value := resp.BulkString{Value: "Hello", Length: 5}
 	data := Data{Value: value}
 
