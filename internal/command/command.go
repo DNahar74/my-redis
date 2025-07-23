@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/DNahar74/my-redis/resp"
-	"github.com/DNahar74/my-redis/store"
+	"github.com/DNahar74/my-redis/internal/resp"
+	"github.com/DNahar74/my-redis/internal/store"
 )
 
 var redisStore *store.Store

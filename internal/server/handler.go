@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/DNahar74/my-redis/command"
-	"github.com/DNahar74/my-redis/resp"
-	"github.com/DNahar74/my-redis/store"
-	"github.com/DNahar74/my-redis/utils"
+	"github.com/DNahar74/my-redis/internal/command"
+	"github.com/DNahar74/my-redis/internal/resp"
+	"github.com/DNahar74/my-redis/internal/store"
+	"github.com/DNahar74/my-redis/internal/utils"
 )
 
 // RedisStore is a global variable to hold the Redis data store
