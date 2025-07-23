@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/DNahar74/my-redis/internal/command"
-	"github.com/DNahar74/my-redis/internal/resp"
-	"github.com/DNahar74/my-redis/internal/store"
-	"github.com/DNahar74/my-redis/internal/utils"
+	"github.com/DNahar74/PulseDB/internal/command"
+	"github.com/DNahar74/PulseDB/internal/resp"
+	"github.com/DNahar74/PulseDB/internal/store"
+	"github.com/DNahar74/PulseDB/internal/utils"
 )
 
 // RedisStore is a global variable to hold the Redis data store

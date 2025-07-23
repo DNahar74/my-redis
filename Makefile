@@ -1,7 +1,7 @@
 .PHONY: build test lint clean install dev docker help
 
 # Binary name
-BINARY_NAME=my-redis
+BINARY_NAME=PulseDB
 BUILD_DIR=bin
 
 # Go parameters
@@ -29,15 +29,15 @@ help:
 build:
 	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(BUILD_DIR)
-	$(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/my-redis
+	$(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/PulseDB
 
 ## build-all: Build for all platforms
 build-all:
 	@echo "Building for all platforms..."
 	@mkdir -p $(BUILD_DIR)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/my-redis
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/my-redis
-	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/my-redis
+	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/PulseDB
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/PulseDB
+	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/PulseDB
 
 ## test: Run tests
 test:
@@ -86,7 +86,7 @@ install: build
 ## dev: Run in development mode
 dev:
 	@echo "Running in development mode..."
-	$(GOCMD) run ./cmd/my-redis
+	$(GOCMD) run ./cmd/PulseDB
 
 ## docker-build: Build Docker image
 docker-build:

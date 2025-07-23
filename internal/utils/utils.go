@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/DNahar74/my-redis/internal/resp"
+	"github.com/DNahar74/PulseDB/internal/resp"
 )
 
 // SendMessage takes connection instance of a client, an RESP string message and sends it to the client

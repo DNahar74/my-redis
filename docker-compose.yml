@@ -1,7 +1,7 @@
 services:
-  my-redis:
+  PulseDB:
     build: .
-    container_name: my-redis
+    container_name: PulseDB
     ports:
       - "6378:6378"
     volumes:
@@ -26,9 +26,9 @@ services:
   redis-cli:
     image: redis:alpine
     depends_on:
-      my-redis:
+      PulseDB:
         condition: service_healthy
-    command: redis-cli -h my-redis
+    command: redis-cli -h PulseDB
     profiles:
       - tools
     networks:

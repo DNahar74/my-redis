@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/DNahar74/my-redis/internal/command"
-	"github.com/DNahar74/my-redis/internal/store"
+	"github.com/DNahar74/PulseDB/internal/command"
+	"github.com/DNahar74/PulseDB/internal/store"
 )
 
 // Server represents a Redis server configurations

@@ -16,7 +16,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o my-redis ./cmd/my-redis
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o PulseDB ./cmd/PulseDB
 
 # Final stage
 FROM scratch
@@ -27,7 +27,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 WORKDIR /root/
 
 # Copy the binary from builder
-COPY --from=builder /app/my-redis .
+COPY --from=builder /app/PulseDB .
 
 # Expose the default Redis port
 EXPOSE 6378
@@ -36,4 +36,4 @@ EXPOSE 6378
 VOLUME ["/data"]
 
 # Run the binary
-CMD ["./my-redis", "-addr", "0.0.0.0:6378"]
+CMD ["./PulseDB", "-addr", "0.0.0.0:6378"]

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DNahar74/my-redis/internal/resp"
+	"github.com/DNahar74/PulseDB/internal/resp"
 )
 
 func TestGetAndSet(t *testing.T) {

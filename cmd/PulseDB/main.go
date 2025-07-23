@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/DNahar74/my-redis/internal/server"
+	"github.com/DNahar74/PulseDB/internal/server"
 )
 
 var (
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	if *ver {
-		fmt.Printf("my-redis %s (commit: %s, built: %s)\n", version, commit, date)
+		fmt.Printf("PulseDB %s (commit: %s, built: %s)\n", version, commit, date)
 		return
 	}
 
@@ -40,7 +40,7 @@ func main() {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 	}
 
-	fmt.Printf("Starting my-redis server on %s\n", *addr)
+	fmt.Printf("Starting PulseDB server on %s\n", *addr)
 	fmt.Printf("Version: %s\n", version)
 
 	redisServer := server.NewServer(*addr)

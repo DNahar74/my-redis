@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/DNahar74/my-redis/internal/resp"
+	"github.com/DNahar74/PulseDB/internal/resp"
 )
 
 // Data represents a key-value pair in the store

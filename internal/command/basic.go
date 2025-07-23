@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/DNahar74/my-redis/internal/resp"
-	"github.com/DNahar74/my-redis/internal/store"
+	"github.com/DNahar74/PulseDB/internal/resp"
+	"github.com/DNahar74/PulseDB/internal/store"
 )
 
 func handlePING() resp.Type {
