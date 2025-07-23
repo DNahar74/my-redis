@@ -1,0 +1,39 @@
+services:
+  my-redis:
+    build: .
+    container_name: my-redis
+    ports:
+      - "6378:6378"
+    volumes:
+      - redis_data:/data
+    environment:
+      - VERBOSE=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "timeout 5 sh -c '</dev/tcp/localhost/6379' 2>/dev/null && echo 'OK' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Redis CLI for testing - uses official Redis image with CLI tools
+  redis-cli:
+    image: redis:alpine
+    depends_on:
+      my-redis:
+        condition: service_healthy
+    command: redis-cli -h my-redis
+    profiles:
+      - tools
+    networks:
+      - default
+
+volumes:
+  redis_data:
+    driver: local
