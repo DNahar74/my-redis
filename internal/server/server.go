@@ -32,7 +32,7 @@ func (s *Server) Start() error {
 		}
 	}(listener)
 
-	fmt.Println("Server listening on port 6379")
+	fmt.Println("Server listening on", s.address)
 
 	var RedisStore = store.CreateStorage()
 	command.InitStore(RedisStore)

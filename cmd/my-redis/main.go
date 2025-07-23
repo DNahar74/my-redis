@@ -19,7 +19,7 @@ var (
 
 func main() {
 	var (
-		addr    = flag.String("addr", "0.0.0.0:6379", "Server address to bind to")
+		addr    = flag.String("addr", "0.0.0.0:6380", "Server address to bind to")
 		help    = flag.Bool("help", false, "Show help information")
 		ver     = flag.Bool("version", false, "Show version information")
 		verbose = flag.Bool("verbose", false, "Enable verbose logging")

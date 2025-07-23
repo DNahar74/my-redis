@@ -21,7 +21,7 @@ func SendMessage(conn net.Conn, message resp.Type) error {
 		return err
 	}
 
-	fmt.Println("Message Sent:", response)
+	fmt.Println("Response Sent:", response)
 
 	return nil
 }

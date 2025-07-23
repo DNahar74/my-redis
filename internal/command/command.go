@@ -25,7 +25,6 @@ func HandleCommands(commands resp.Type) (resp.Type, error) {
 			return nil, err
 		}
 
-		fmt.Println("It's a simple string with value:", val)
 		return val, nil
 	case resp.SimpleError:
 		val, err := handleSimpleError(commands)
@@ -33,7 +32,6 @@ func HandleCommands(commands resp.Type) (resp.Type, error) {
 			return nil, err
 		}
 
-		fmt.Println("It's a simple error with value:", val)
 		return val, nil
 	case resp.Integer:
 		val, err := handleInteger(commands)
@@ -41,7 +39,6 @@ func HandleCommands(commands resp.Type) (resp.Type, error) {
 			return nil, err
 		}
 
-		fmt.Println("It's an integer with value:", val)
 		return val, nil
 	case resp.BulkString:
 		val, err := handleBulkString(commands)
@@ -49,7 +46,6 @@ func HandleCommands(commands resp.Type) (resp.Type, error) {
 			return nil, err
 		}
 
-		fmt.Println("It's a bulk string with value:", val)
 		return val, nil
 	case resp.Array:
 		val, err := handleArray(commands)
@@ -57,7 +53,6 @@ func HandleCommands(commands resp.Type) (resp.Type, error) {
 			return nil, err
 		}
 
-		fmt.Println("It's an array with elements:", val)
 		return val, nil
 	default:
 		fmt.Printf("Unknown type: %T", commands)

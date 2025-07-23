@@ -66,9 +66,6 @@ func handleSET(k, v resp.Type, specs ...resp.Type) (resp.Type, error) {
 				return nil, err
 			}
 
-			// fmt.Println(val)
-			// fmt.Println(time.Now())
-
 			storageData.Expiry = time.Now().Add(time.Duration(val) * time.Second)
 		default:
 			return nil, errors.New("unknown specifier")

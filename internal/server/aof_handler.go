@@ -41,13 +41,15 @@ func writeToFile(file *os.File, s *store.Store) {
 func restoreStorage() error {
 	fileB, err := os.ReadFile("./commands.aof")
 	if err != nil {
+		if os.IsNotExist(err) {
+			// file doesn't exist, silently skip
+			return nil
+		}
 		return err
 	}
 
 	content := string(fileB)
 	cmds := strings.Split(content, "\n#\n")
-
-	fmt.Println("commands ::", cmds)
 
 	for i, c := range cmds[:len(cmds)-1] {
 		cmd, err := resp.Deserialize(c)
