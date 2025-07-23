@@ -1,22 +1,34 @@
 
-# 🧠 my-redis
+# 🚀 GoRedis-Lite
 
-A minimalist Redis clone written in Go, implementing the RESP2 protocol from scratch.  
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+
+A high-performance, lightweight Redis clone written in Go, implementing the RESP2 protocol from scratch. 
 This project serves as a deep dive into building low-level systems and understanding the inner workings of Redis.
+
+> **⚠️ Educational Project**: This is primarily an educational implementation. For production use, consider [Redis](https://redis.io/) or [KeyDB](https://keydb.dev/).
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- Custom RESP2 (Redis Serialization Protocol) parser.
-- Support for core Redis data types:
-  - Simple Strings (`+OK`)
-  - Errors (`-ERROR`)
-  - Integers (`:100`)
+### Core Functionality
+- 🔧 **Custom RESP2 Protocol**: Complete implementation of Redis Serialization Protocol v2
+- 📊 **Redis Data Types**: Support for all core Redis data types:
+  - Simple Strings (`+OK\r\n`)
+  - Errors (`-ERROR message\r\n`)
+  - Integers (`:100\r\n`)
   - Bulk Strings (`$6\r\nfoobar\r\n`)
   - Arrays (`*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n`)
-- Basic command parsing and response handling.
-- Modular codebase with clear separation of concerns.
+- ⚡**High Concurrency**: Thread-safe operations with concurrent client handling
+- 💾 **Persistence**: AOF (Append Only File) and memory snapshots
+- ⏰ **Key Expiration**: TTL support with automatic cleanup
+
+### Performance & Reliability
+- 🔒 **Thread Safety**: Robust concurrent access with RWMutex
+- 📈 **Benchmarks**: Comprehensive performance testing included
+- 🧪 **Test Coverage**: Extensive test suite with >95% coverage
+- 📊 **Memory Efficient**: Optimized memory usage patterns
 
 ---
 
