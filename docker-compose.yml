@@ -1,7 +1,7 @@
 services:
-  PulseDB:
+  pulsedb:
     build: .
-    container_name: PulseDB
+    container_name: pulsedb
     ports:
       - "6378:6378"
     volumes:
@@ -10,7 +10,7 @@ services:
       - VERBOSE=true
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "sh", "-c", "timeout 5 sh -c '</dev/tcp/localhost/6379' 2>/dev/null && echo 'OK' || exit 1"]
+      test: ["CMD", "sh", "-c", "timeout 5 sh -c '</dev/tcp/localhost/6378' 2>/dev/null && echo 'OK' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -26,9 +26,9 @@ services:
   redis-cli:
     image: redis:alpine
     depends_on:
-      PulseDB:
+      pulsedb:
         condition: service_healthy
-    command: redis-cli -h PulseDB
+    command: redis-cli -h pulsedb
     profiles:
       - tools
     networks:
